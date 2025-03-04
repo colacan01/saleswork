@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}작업 상세 내역{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1 class="mb-4">작업 상세 내역</h1>
+  
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>{{ work_item.work_name }}</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>일시:</strong> {{ work_item.date_time|date:"Y-m-d H:i" }}</p>
+          <p><strong>작업자:</strong> {{ work_item.user.username }}</p>
+          <p><strong>결제수단:</strong> {{ work_item.get_payment_method_display }}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>재료비:</strong> {{ work_item.material_cost }}원</p>
+          <p><strong>공임:</strong> {{ work_item.labor_cost }}원</p>
+          <p><strong>총 금액:</strong> {{ work_item.total_amount }}원</p>
+        </div>
+      </div>
+      
+      {% if work_item.notes %}
+      <div class="mt-3">
+        <h6>비고</h6>
+        <p>{{ work_item.notes }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <h3 class="mb-3">사용 재료 목록</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>재료명</th>
+        <th>수량</th>
+        <th>단가</th>
+        <th>총 비용</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for material in materials %}
+      <tr>
+        <td>{{ material.product.name }}</td>
+        <td>{{ material.quantity }}</td>
+        <td>{{ material.unit_price }}원</td>
+        <td>{{ material.total_cost }}원</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4" class="text-center">등록된 재료가 없습니다.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="mt-4">
+    <a href="{% url 'main:index' %}" class="btn btn-secondary">목록으로</a>
+  </div>
+</div>
+{% endblock %}

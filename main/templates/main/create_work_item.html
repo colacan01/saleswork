@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">작업 내용 입력</h2>
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>작업 정보</h5>
+            </div>
+            <div class="card-body">
+                {% for field in work_form %}
+                <div class="mb-3 row">
+                    <label for="{{ field.id_for_label }}" class="col-sm-2 col-form-label">{{ field.label }}</label>
+                    <div class="col-sm-10">
+                        {{ field }}
+                        {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in field.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>재료 정보</h5>
+                <button type="button" id="add-material" class="btn btn-sm btn-primary">
+                    + 재료 추가
+                </button>
+            </div>
+            <div class="card-body">
+                {{ material_formset.management_form }}
+                
+                <table class="table table-bordered" id="material-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">재료명</th>
+                            <th style="width: 20%">수량</th>
+                            <th style="width: 30%">단가</th>
+                            <th style="width: 10%">삭제</th>
+                        </tr>
+                    </thead>
+                    <tbody id="material-tbody">
+                        {% for form in material_formset %}
+                        <tr class="material-form">
+                            <td>
+                                {{ form.product }}
+                                {{ form.id }}
+                                {% if form.product.errors %}
+                                <div class="invalid-feedback d-block">{{ form.product.errors }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ form.quantity }}
+                                {% if form.quantity.errors %}
+                                <div class="invalid-feedback d-block">{{ form.quantity.errors }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ form.unit_price }}
+                                {% if form.unit_price.errors %}
+                                <div class="invalid-feedback d-block">{{ form.unit_price.errors }}</div>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="form-check">
+                                    {{ form.DELETE }}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success">저장하기</button>
+            <a href="{% url 'work_item_list' %}" class="btn btn-secondary">취소</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 폼 관리 요소
+        const totalFormsInput = document.querySelector('#id_materials-TOTAL_FORMS');
+        const addMaterialBtn = document.querySelector('#add-material');
+        
+        // 폼 추가 버튼 이벤트
+        addMaterialBtn.addEventListener('click', function() {
+            const currentFormCount = parseInt(totalFormsInput.value);
+            
+            // 기존 폼의 첫번째 요소를 복제
+            const formRow = document.querySelector('.material-form').cloneNode(true);
+            
+            // 모든 입력 요소의 ID와 name 속성 업데이트
+            const formElements = formRow.querySelectorAll('input, select');
+            formElements.forEach(element => {
+                if (element.id) {
+                    element.id = element.id.replace(/-\d+-/, `-${currentFormCount}-`);
+                }
+                if (element.name) {
+                    element.name = element.name.replace(/-\d+-/, `-${currentFormCount}-`);
+                }
+                // 입력 값 초기화
+                if (element.type !== 'hidden' && element.type !== 'checkbox') {
+                    element.value = '';
+                }
+                if (element.type === 'checkbox') {
+                    element.checked = false;
+                }
+            });
+            
+            // 오류 메시지 제거
+            const errorElements = formRow.querySelectorAll('.invalid-feedback');
+            errorElements.forEach(element => element.remove());
+            
+            // 새 폼 추가
+            document.querySelector('#material-tbody').appendChild(formRow);
+            
+            // 총 폼 개수 업데이트
+            totalFormsInput.value = currentFormCount + 1;
+        });
+        
+        // 삭제 체크박스 처리
+        document.querySelector('#material-tbody').addEventListener('change', function(event) {
+            if (event.target.type === 'checkbox' && event.target.name.includes('DELETE')) {
+                const row = event.target.closest('tr');
+                if (event.target.checked) {
+                    row.style.textDecoration = 'line-through';
+                    row.style.opacity = '0.5';
+                } else {
+                    row.style.textDecoration = 'none';
+                    row.style.opacity = '1';
+                }
+            }
+        });
+
+        // 제품 선택시 단가 자동 설정
+        document.querySelector('#material-tbody').addEventListener('change', function(event) {
+            if (event.target.name.includes('product')) {
+                const row = event.target.closest('tr');
+                const productSelect = event.target;
+                const unitPriceInput = row.querySelector('input[name$="-unit_price"]');
+                
+                if (productSelect.value) {
+                    // AJAX로 제품 정보 가져오기 (실제로 구현하려면 추가 작업 필요)
+                    // 여기서는 예시일 뿐입니다
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
