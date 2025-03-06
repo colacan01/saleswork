@@ -31,9 +31,9 @@
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </div>      
         
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5>재료 정보</h5>
                 <button type="button" id="add-material" class="btn btn-sm btn-primary">
@@ -90,6 +90,36 @@
             </div>
         </div>
         
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>결제 금액 정보</h5>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-sm-2">
+                        <label class="col-form-label">재료비</label>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-control" id="total-material-display" readonly>0</div>
+                    </div>
+                    <div class="col-sm-2">
+                        <label class="col-form-label">공임</label>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-control" id="labor-cost-display" readonly>0</div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-sm-2">
+                        <label class="col-form-label fw-bold">총 결제 금액</label>
+                    </div>
+                    <div class="col-sm-10">
+                        <h4 class="mb-0" id="grand-total-display">0원</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="mt-4">
             <button type="submit" class="btn btn-success">저장하기</button>
             <a href="{% url 'work_item_list' %}" class="btn btn-secondary">취소</a>
@@ -105,11 +135,12 @@
         
         // 재료비 입력란 (작업정보 섹션에 있는 필드)
         // 주의: 실제 재료비 입력 필드의 ID를 확인하고 수정하세요
-        const materialCostField = document.querySelector('#id_material_cost');
+        // const materialCostField = document.querySelector('#id_material_cost');
         
         // 페이지 로드 시 모든 행의 합계 계산
         calculateAllTotals();
         calculateTotalMaterialCost();
+        updateGrandTotal();
         
         // 폼 추가 버튼 이벤트
         addMaterialBtn.addEventListener('click', function() {
@@ -179,6 +210,7 @@
                 const row = event.target.closest('tr');
                 calculateRowTotal(row);
                 calculateTotalMaterialCost();
+                updateGrandTotal(); // 총 금액 업데이트 추가
             }
         });
 
@@ -194,6 +226,22 @@
                 }
             }
         });
+
+        // 공임 입력 필드에 이벤트 리스너 추가
+        const laborCostField = document.querySelector('#id_labor_cost');
+        if (laborCostField) {
+            laborCostField.addEventListener('input', function() {
+                updateGrandTotal();
+            });
+        }
+        
+        // 재료비 필드에 이벤트 리스너 추가
+        const materialCostField = document.querySelector('#id_material_cost');
+        if (materialCostField) {
+            materialCostField.addEventListener('input', function() {
+                updateGrandTotal();
+            });
+        }
     });
 
     function updateUnitPrice(selectElement) {
@@ -256,9 +304,43 @@
         if (materialCostField) {
             materialCostField.value = totalCost;
             
+            // 총 재료비 표시 업데이트
+            const totalMaterialDisplay = document.querySelector('#total-material-display');
+            if (totalMaterialDisplay) {
+                totalMaterialDisplay.textContent = totalCost.toLocaleString('ko-KR');
+            }
+            
             // 입력 변경 이벤트 발생 (다른 계산이 필요한 경우)
             const event = new Event('input', { bubbles: true });
             materialCostField.dispatchEvent(event);
+        }
+    }
+    
+    // 총 금액(재료비+공임) 계산 및 표시
+    function updateGrandTotal() {
+        const materialCostField = document.querySelector('#id_material_cost');
+        const laborCostField = document.querySelector('#id_labor_cost');
+        
+        let materialCost = 0;
+        let laborCost = 0;
+        
+        if (materialCostField) {
+            materialCost = parseFloat(materialCostField.value) || 0;
+        }
+        
+        if (laborCostField) {
+            laborCost = parseFloat(laborCostField.value) || 0;
+            // 공임 금액 표시 업데이트
+            const laborCostDisplay = document.querySelector('#labor-cost-display');
+            if (laborCostDisplay) {
+                laborCostDisplay.textContent = laborCost.toLocaleString('ko-KR');
+            }
+        }
+        
+        const grandTotal = materialCost + laborCost;
+        const grandTotalDisplay = document.querySelector('#grand-total-display');
+        if (grandTotalDisplay) {
+            grandTotalDisplay.textContent = grandTotal.toLocaleString('ko-KR') + '원';
         }
     }
 </script>

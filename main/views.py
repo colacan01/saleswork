@@ -26,6 +26,7 @@ def work_detail(request, work_id):
 def create_work_item(request):
     if request.method == 'POST':
         work_form = WorkItemForm(request.POST)
+        material_formset = MaterialFormSet(request.POST)
         
         if work_form.is_valid():
             # 작업 내용 저장
