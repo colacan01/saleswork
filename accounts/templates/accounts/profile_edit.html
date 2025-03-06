@@ -3,27 +3,67 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">프로필 수정</div>
-                <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h4>사용자 정보</h4>
+        <div class="col-md-10">
+            <h2 class="mb-4 text-center">프로필 관리</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <!-- 사용자 정보 카드 -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">사용자 정보</h5>
+                            </div>
+                            <div class="card-body">
                                 {{ user_form.as_p }}
                             </div>
-                            <div class="col-md-6">
-                                <h4>프로필 정보</h4>
+                        </div>
+                    </div>
+                    
+                    <!-- 프로필 정보 카드 -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">프로필 정보</h5>
+                            </div>
+                            <div class="card-body">
                                 {{ profile_form.as_p }}
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">저장하기</button>
-                    </form>
+                    </div>
                 </div>
-            </div>
+                
+                <!-- 매장 정보 카드 -->
+                <div id="store-section" class="mb-4" {% if not user.profile.is_store_owner %}style="display:none;"{% endif %}>
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">매장 정보</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ store_form.as_p }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">저장하기</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+    // 매장 소유자 체크박스 상태에 따라 매장 정보 섹션 표시/숨김
+    document.addEventListener('DOMContentLoaded', function() {
+        var isStoreOwnerCheckbox = document.querySelector('input[name="is_store_owner"]');
+        var storeSection = document.getElementById('store-section');
+        
+        if (isStoreOwnerCheckbox) {
+            isStoreOwnerCheckbox.addEventListener('change', function() {
+                storeSection.style.display = this.checked ? 'block' : 'none';
+            });
+        }
+    });
+</script>
 {% endblock %}

@@ -12,6 +12,8 @@ class UserProfile(models.Model):
     address = models.TextField(null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
+    store = models.ForeignKey('Store', on_delete=models.CASCADE, related_name='profiles', null=True, blank=True, verbose_name='매장')
+    is_store_owner = models.BooleanField(default=False, verbose_name='매장 소유자 여부')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -35,7 +37,6 @@ class Store(models.Model):
     phone_number = models.CharField(max_length=15, verbose_name='전화번호')
     address = models.TextField(verbose_name='주소')
     website = models.URLField(null=True, blank=True, verbose_name='웹사이트')
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='stores', verbose_name='매장 대표')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

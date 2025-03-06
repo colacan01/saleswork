@@ -2,7 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, StoreForm
+from .models import Store
+import os
+from django.conf import settings
 
 def register_view(request):
     if request.method == 'POST':
@@ -34,21 +37,61 @@ def logout_view(request):
 
 @login_required
 def profile_edit_view(request):
+    # Store 정보 처리 로직 추가
+    store = None
+    if request.user.profile.store:
+        store = request.user.profile.store
+    
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
         profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
+        # 매장 소유자인 경우에만 store_form 처리
+        store_form = None
+        if 'is_store_owner' in request.POST:
+            if store:
+                store_form = StoreForm(request.POST, instance=store)
+            else:
+                store_form = StoreForm(request.POST)
+        
+        forms_valid = user_form.is_valid() and profile_form.is_valid()
+        if store_form:
+            forms_valid = forms_valid and store_form.is_valid()
+            
+        if forms_valid:
+            user = user_form.save()
+            profile = profile_form.save(commit=False)
+            
+            # 프로필 이미지 저장 경로 확인 및 생성
+            if 'profile_image' in request.FILES:
+                # 기본 미디어 경로에서 프로필 이미지가 저장될 경로 가져오기
+                # 일반적으로 모델에서 정의한 upload_to 경로를 사용합니다
+                upload_path = os.path.join(settings.MEDIA_ROOT, 'profile_images')
+                if not os.path.exists(upload_path):
+                    os.makedirs(upload_path, exist_ok=True)
+            
+            # Store 정보 저장
+            if profile.is_store_owner and store_form:
+                if store:
+                    store_form.save()
+                else:
+                    new_store = store_form.save()
+                    profile.store = new_store
+            elif not profile.is_store_owner:
+                profile.store = None
+                
+            profile.save()
             messages.success(request, '프로필이 성공적으로 업데이트되었습니다!')
             return redirect('accounts:profile_edit')
     else:
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)
+        store_form = StoreForm(instance=store) if store else StoreForm()
     
     context = {
         'user_form': user_form,
-        'profile_form': profile_form
+        'profile_form': profile_form,
+        'store_form': store_form,
+        'has_store': store is not None
     }
     return render(request, 'accounts/profile_edit.html', context)
