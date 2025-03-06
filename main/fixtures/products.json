@@ -1,0 +1,222 @@
+[
+  {
+    "model": "main.product",
+    "pk": 1,
+    "fields": {
+      "name": "LED 작업등",
+      "sale_price": "45000",
+      "unit_price": "25000",
+      "image": "",
+      "stock_quantity": 15
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 2, 
+    "fields": {
+      "name": "공구 세트",
+      "sale_price": "120000",
+      "unit_price": "75000",
+      "image": "",
+      "stock_quantity": 8
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 3,
+    "fields": {
+      "name": "전선 20m",
+      "sale_price": "15000",
+      "unit_price": "8000",
+      "image": "",
+      "stock_quantity": 30
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 4,
+    "fields": {
+      "name": "배선 자재",
+      "sale_price": "32000",
+      "unit_price": "18000",
+      "image": "",
+      "stock_quantity": 25
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 5,
+    "fields": {
+      "name": "안전 장비 세트",
+      "sale_price": "65000",
+      "unit_price": "40000",
+      "image": "",
+      "stock_quantity": 12
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 6,
+    "fields": {
+      "name": "인테리어 조명",
+      "sale_price": "85000",
+      "unit_price": "45000",
+      "image": "",
+      "stock_quantity": 10
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 7,
+    "fields": {
+      "name": "방수 콘센트",
+      "sale_price": "12000",
+      "unit_price": "5000",
+      "image": "",
+      "stock_quantity": 50
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 8,
+    "fields": {
+      "name": "전동 드릴",
+      "sale_price": "95000",
+      "unit_price": "60000",
+      "image": "",
+      "stock_quantity": 7
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 9,
+    "fields": {
+      "name": "접지 케이블",
+      "sale_price": "22000",
+      "unit_price": "10000",
+      "image": "",
+      "stock_quantity": 18
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 10,
+    "fields": {
+      "name": "분전반 키트",
+      "sale_price": "150000",
+      "unit_price": "95000",
+      "image": "",
+      "stock_quantity": 5
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 11,
+    "fields": {
+      "name": "멀티탭 4구",
+      "sale_price": "18000",
+      "unit_price": "9000",
+      "image": "",
+      "stock_quantity": 45
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 12,
+    "fields": {
+      "name": "누전차단기",
+      "sale_price": "35000",
+      "unit_price": "20000",
+      "image": "",
+      "stock_quantity": 15
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 13,
+    "fields": {
+      "name": "천장등 세트",
+      "sale_price": "120000",
+      "unit_price": "70000",
+      "image": "",
+      "stock_quantity": 9
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 14,
+    "fields": {
+      "name": "전선관 10m",
+      "sale_price": "28000",
+      "unit_price": "15000",
+      "image": "",
+      "stock_quantity": 20
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 15,
+    "fields": {
+      "name": "절연 테이프 세트",
+      "sale_price": "8500",
+      "unit_price": "4000",
+      "image": "",
+      "stock_quantity": 60
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 16,
+    "fields": {
+      "name": "콘센트 커버",
+      "sale_price": "6000",
+      "unit_price": "2500",
+      "image": "",
+      "stock_quantity": 100
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 17,
+    "fields": {
+      "name": "전기 테스터기",
+      "sale_price": "45000",
+      "unit_price": "25000",
+      "image": "",
+      "stock_quantity": 7
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 18,
+    "fields": {
+      "name": "계단용 스위치",
+      "sale_price": "15000",
+      "unit_price": "8000",
+      "image": "",
+      "stock_quantity": 25
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 19,
+    "fields": {
+      "name": "스마트 전구 4개 세트",
+      "sale_price": "65000",
+      "unit_price": "35000",
+      "image": "",
+      "stock_quantity": 12
+    }
+  },
+  {
+    "model": "main.product",
+    "pk": 20,
+    "fields": {
+      "name": "욕실 방수등",
+      "sale_price": "42000",
+      "unit_price": "22000",
+      "image": "",
+      "stock_quantity": 14
+    }
+  }
+]
