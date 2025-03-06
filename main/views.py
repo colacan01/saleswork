@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from .models import WorkItem, Material
+from django.http import JsonResponse
+from .models import WorkItem, Material, Product
 from .forms import WorkItemForm, MaterialFormSet
 
 # Create your views here.
@@ -75,3 +76,10 @@ def work_item_list(request):
     }
     
     return render(request, 'main/work_item_list.html', context)
+
+def get_product_price(request, product_id):
+    try:
+        product = Product.objects.get(id=product_id)
+        return JsonResponse({'price': product.unit_price})
+    except Product.DoesNotExist:
+        return JsonResponse({'error': '제품을 찾을 수 없습니다.'}, status=404)

@@ -13,6 +13,7 @@ class WorkItem(models.Model):
     ]
     
     date_time = models.DateTimeField(verbose_name='일시')
+    customer_phone = models.CharField(verbose_name='고객전화번호', max_length=20, blank=True, null=True)
     work_name = models.CharField(verbose_name='작업명', max_length=200)
     material_cost = models.DecimalField(verbose_name='재료비', max_digits=10, decimal_places=0)
     labor_cost = models.DecimalField(verbose_name='공임', max_digits=10, decimal_places=0)

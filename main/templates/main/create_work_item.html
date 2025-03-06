@@ -46,9 +46,10 @@
                 <table class="table table-bordered" id="material-table">
                     <thead>
                         <tr>
-                            <th style="width: 40%">재료명</th>
-                            <th style="width: 20%">수량</th>
-                            <th style="width: 30%">단가</th>
+                            <th style="width: 35%">재료명</th>
+                            <th style="width: 15%">수량</th>
+                            <th style="width: 20%">단가</th>
+                            <th style="width: 20%">합계</th>
                             <th style="width: 10%">삭제</th>
                         </tr>
                     </thead>
@@ -73,6 +74,9 @@
                                 {% if form.unit_price.errors %}
                                 <div class="invalid-feedback d-block">{{ form.unit_price.errors }}</div>
                                 {% endif %}
+                            </td>
+                            <td>
+                                <div class="form-control total-price" readonly>0</div>
                             </td>
                             <td class="text-center">
                                 <div class="form-check">
@@ -99,6 +103,14 @@
         const totalFormsInput = document.querySelector('#id_materials-TOTAL_FORMS');
         const addMaterialBtn = document.querySelector('#add-material');
         
+        // 재료비 입력란 (작업정보 섹션에 있는 필드)
+        // 주의: 실제 재료비 입력 필드의 ID를 확인하고 수정하세요
+        const materialCostField = document.querySelector('#id_material_cost');
+        
+        // 페이지 로드 시 모든 행의 합계 계산
+        calculateAllTotals();
+        calculateTotalMaterialCost();
+        
         // 폼 추가 버튼 이벤트
         addMaterialBtn.addEventListener('click', function() {
             const currentFormCount = parseInt(totalFormsInput.value);
@@ -124,6 +136,12 @@
                 }
             });
             
+            // 합계 초기화
+            const totalElement = formRow.querySelector('.total-price');
+            if (totalElement) {
+                totalElement.textContent = '0';
+            }
+            
             // 오류 메시지 제거
             const errorElements = formRow.querySelectorAll('.invalid-feedback');
             errorElements.forEach(element => element.remove());
@@ -133,6 +151,9 @@
             
             // 총 폼 개수 업데이트
             totalFormsInput.value = currentFormCount + 1;
+            
+            // 전체 재료비 다시 계산
+            calculateTotalMaterialCost();
         });
         
         // 삭제 체크박스 처리
@@ -146,6 +167,18 @@
                     row.style.textDecoration = 'none';
                     row.style.opacity = '1';
                 }
+                
+                // 전체 재료비 다시 계산
+                calculateTotalMaterialCost();
+            }
+        });
+
+        // 수량 또는 단가 변경 시 합계 계산
+        document.querySelector('#material-tbody').addEventListener('input', function(event) {
+            if (event.target.name.includes('quantity') || event.target.name.includes('unit_price')) {
+                const row = event.target.closest('tr');
+                calculateRowTotal(row);
+                calculateTotalMaterialCost();
             }
         });
 
@@ -157,11 +190,76 @@
                 const unitPriceInput = row.querySelector('input[name$="-unit_price"]');
                 
                 if (productSelect.value) {
-                    // AJAX로 제품 정보 가져오기 (실제로 구현하려면 추가 작업 필요)
-                    // 여기서는 예시일 뿐입니다
+                    updateUnitPrice(productSelect);
                 }
             }
         });
     });
+
+    function updateUnitPrice(selectElement) {
+        const productId = selectElement.value;
+        if (!productId) return;
+        
+        // 현재 폼 찾기
+        const formRow = selectElement.closest('.form-row') || selectElement.closest('tr') || selectElement.closest('div');
+        const unitPriceInput = formRow.querySelector('.unit-price-input');
+        
+        if (!unitPriceInput) return;
+        
+        // AJAX 요청으로 제품 가격 가져오기
+        fetch(`/get-product-price/${productId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.price !== undefined) {
+                    unitPriceInput.value = data.price;
+                    calculateRowTotal(formRow); // 단가 업데이트 후 합계 재계산
+                }
+            })
+            .catch(error => console.error('제품 가격을 가져오는 중 오류 발생:', error));
+    }
+    
+    // 한 행의 합계 계산
+    function calculateRowTotal(row) {
+        const quantityInput = row.querySelector('input[name$="-quantity"]');
+        const unitPriceInput = row.querySelector('input[name$="-unit_price"]');
+        const totalElement = row.querySelector('.total-price');
+        
+        if (quantityInput && unitPriceInput && totalElement) {
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const unitPrice = parseFloat(unitPriceInput.value) || 0;
+            const total = quantity * unitPrice;
+            
+            // 천 단위 구분자로 표시
+            totalElement.textContent = total.toLocaleString('ko-KR');
+        }
+    }
+    
+    // 모든 행의 합계 계산
+    function calculateAllTotals() {
+        const rows = document.querySelectorAll('.material-form');
+        rows.forEach(row => calculateRowTotal(row));
+    }
+    
+    // 전체 재료비 계산 후 작업정보 섹션의 재료비 입력란에 설정
+    function calculateTotalMaterialCost() {
+        const totalElements = document.querySelectorAll('.material-form:not(.d-none) .total-price');
+        let totalCost = 0;
+        
+        totalElements.forEach(element => {
+            // 천 단위 구분자 제거 후 숫자로 변환
+            const value = element.textContent.replace(/,/g, '');
+            totalCost += parseFloat(value) || 0;
+        });
+        
+        // 작업정보 섹션의 재료비 입력란에 값 설정
+        const materialCostField = document.querySelector('#id_material_cost');
+        if (materialCostField) {
+            materialCostField.value = totalCost;
+            
+            // 입력 변경 이벤트 발생 (다른 계산이 필요한 경우)
+            const event = new Event('input', { bubbles: true });
+            materialCostField.dispatchEvent(event);
+        }
+    }
 </script>
 {% endblock %}
