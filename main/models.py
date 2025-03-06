@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from accounts.models import Store  # Store 모델 import 추가
 
 # Create your models here.
 class WorkItem(models.Model):
@@ -25,6 +26,7 @@ class WorkItem(models.Model):
     )
     notes = models.TextField(verbose_name='비고', blank=True, null=True)
     user = models.ForeignKey(User, verbose_name='작업자', on_delete=models.CASCADE)
+    store = models.ForeignKey(Store, verbose_name='매장', on_delete=models.CASCADE, blank=True, null=True)  # 매장 필드 추가
     
     def __str__(self):
         return f"{self.work_name} ({self.date_time.strftime('%Y-%m-%d')})"
@@ -41,6 +43,7 @@ class Product(models.Model):
     unit_price = models.DecimalField(verbose_name='단위가격', max_digits=10, decimal_places=0)
     image = models.ImageField(verbose_name='상품 이미지', upload_to='products/', blank=True, null=True)
     stock_quantity = models.PositiveIntegerField(verbose_name='재고 수량')
+    store = models.ForeignKey(Store, verbose_name='매장', on_delete=models.CASCADE, blank=True, null=True)  # 매장 필드 추가
     
     def __str__(self):
         return self.name
@@ -51,6 +54,7 @@ class Material(models.Model):
     product = models.ForeignKey(Product, verbose_name='재료명', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(verbose_name='수량')
     unit_price = models.DecimalField(verbose_name='단가', max_digits=10, decimal_places=0)
+    store = models.ForeignKey(Store, verbose_name='매장', on_delete=models.CASCADE, blank=True, null=True)  # 매장 필드 추가
     
     def __str__(self):
         return self.product.name
