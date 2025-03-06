@@ -23,14 +23,14 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')  # 메인 페이지로 리디렉션
+            return redirect('/')  # 메인 페이지로 리디렉션
         else:
             messages.error(request, '아이디 또는 비밀번호가 올바르지 않습니다.')
     return render(request, 'accounts/login.html')
 
 def logout_view(request):
     logout(request)
-    return redirect('home')
+    return redirect('/')
 
 @login_required
 def profile_edit_view(request):
