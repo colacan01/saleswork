@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from .models import WorkItem, Material, Product
 from .forms import WorkItemForm, MaterialFormSet
+from accounts.models import Store, UserProfile
 
 # Create your views here.
 def index(request):
@@ -55,8 +56,9 @@ def work_item_list(request):
     # 필터링 파라미터 처리
     filter_params = {}
     
-    # 기본적으로 로그인한 사용자의 작업 항목만 표시
-    filter_params['user'] = request.user
+    # 사용자 프로필의 store로 필터링
+    user_profile = request.user.profile  # 사용자의 프로필 가져오기
+    filter_params['store'] = user_profile.store  # user 대신 store로 필터링
     
     # 추가 필터링 (예: 날짜 범위, 결제수단 등)
     payment_method = request.GET.get('payment_method')
