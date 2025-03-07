@@ -37,10 +37,8 @@ def logout_view(request):
 
 @login_required
 def profile_edit_view(request):
-    # Store 정보 처리 로직 추가
-    store = None
-    if request.user.profile.store:
-        store = request.user.profile.store
+    # Store 정보 처리 로직 수정 - 이제 사용자가 소유한 매장을 찾음
+    store = Store.objects.filter(owner=request.user).first()
     
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
@@ -72,16 +70,20 @@ def profile_edit_view(request):
                 if not os.path.exists(upload_path):
                     os.makedirs(upload_path, exist_ok=True)
             
-            # Store 정보 저장
+            # Store 정보 저장 - 변경된 관계 모델에 맞게 수정
             if is_owner and store_form:
                 if store:
-                    store = store_form.save()  # 변수에 저장된 인스턴스 갱신
-                    profile.store = store  # 프로필에 연결
+                    store = store_form.save(commit=False)
+                    store.owner = user  # 소유자를 현재 사용자로 설정
+                    store.save()
                 else:
-                    new_store = store_form.save()
-                    profile.store = new_store
-            elif not is_owner:
-                profile.store = None
+                    new_store = store_form.save(commit=False)
+                    new_store.owner = user  # 소유자를 현재 사용자로 설정
+                    new_store.save()
+            elif not is_owner and store:
+                # 소유자 아니라고 표시했으면 연결된 매장 소유권 제거
+                store.owner = None
+                store.save()
                 
             profile.save()
             messages.success(request, '프로필이 성공적으로 업데이트되었습니다!')

@@ -58,7 +58,8 @@ def work_item_list(request):
     
     # 사용자 프로필의 store로 필터링
     user_profile = request.user.profile  # 사용자의 프로필 가져오기
-    filter_params['store'] = user_profile.store  # user 대신 store로 필터링
+    if hasattr(user_profile, 'store') and user_profile.store:
+        filter_params['store'] = user_profile.store  # user 대신 store로 필터링
     
     # 추가 필터링 (예: 날짜 범위, 결제수단 등)
     payment_method = request.GET.get('payment_method')

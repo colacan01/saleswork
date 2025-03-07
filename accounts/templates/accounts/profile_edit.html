@@ -5,7 +5,9 @@
     <div class="row justify-content-center">
         <div class="col-md-10">
             <h2 class="mb-4 text-center">프로필 관리</h2>
-            <form method="post" enctype="multipart/form-data">
+            
+            <!-- 폼 테스트를 위해 간소화된 폼 -->
+            <form method="post" enctype="multipart/form-data" id="profile-form">
                 {% csrf_token %}
                 <div class="row">
                     <!-- 사용자 정보 카드 -->
@@ -46,12 +48,13 @@
                 </div>
                 
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary btn-lg px-5">저장하기</button>
+                    <button type="submit" class="btn btn-primary btn-lg px-5" id="save-button">저장하기</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 <!-- Toast Messages -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
     {% if messages %}
@@ -68,9 +71,10 @@
         {% endfor %}
     {% endif %}
 </div>
+
 <script>
-    // 매장 소유자 체크박스 상태에 따라 매장 정보 섹션 표시/숨김
     document.addEventListener('DOMContentLoaded', function() {
+        // 체크박스 이벤트
         var isStoreOwnerCheckbox = document.querySelector('input[name="is_store_owner"]');
         var storeSection = document.getElementById('store-section');
         
@@ -78,6 +82,28 @@
             isStoreOwnerCheckbox.addEventListener('change', function() {
                 storeSection.style.display = this.checked ? 'block' : 'none';
             });
+        }
+        
+        // 폼 제출 디버깅
+        const form = document.getElementById('profile-form');
+        const saveButton = document.getElementById('save-button');
+        
+        saveButton.addEventListener('click', function(e) {
+            console.log('저장하기 버튼 클릭됨');
+        });
+        
+        form.addEventListener('submit', function(e) {
+            console.log('폼 제출 시도중...');
+            // e.preventDefault(); // 디버깅 후 제거
+        });
+        
+        // 토스트 초기화
+        if (typeof bootstrap !== 'undefined') {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
+            });
+            toastList.forEach(toast => toast.show());
         }
     });
 </script>

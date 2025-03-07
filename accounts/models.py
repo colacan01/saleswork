@@ -32,10 +32,11 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 class Store(models.Model):
-    name = models.CharField(max_length=100, verbose_name='매장명')
-    business_number = models.CharField(max_length=20, verbose_name='사업자번호')
-    phone_number = models.CharField(max_length=15, verbose_name='전화번호')
-    address = models.TextField(verbose_name='주소')
+    name = models.CharField(max_length=100, verbose_name='매장명', null=True, blank=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='stores', verbose_name='소유자', null=True, blank=True)
+    business_number = models.CharField(max_length=20, verbose_name='사업자번호', null=True, blank=True)
+    phone_number = models.CharField(max_length=15, verbose_name='전화번호', null=True, blank=True)
+    address = models.TextField(verbose_name='주소', null=True, blank=True)
     website = models.URLField(null=True, blank=True, verbose_name='웹사이트')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
