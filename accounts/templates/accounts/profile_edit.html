@@ -52,7 +52,22 @@
         </div>
     </div>
 </div>
-
+<!-- Toast Messages -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    {% if messages %}
+        {% for message in messages %}
+            <div id="toast-{{ forloop.counter }}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header {% if message.tags %}{% if message.tags == 'error' %}bg-danger{% else %}bg-{{ message.tags }}{% endif %} text-white{% endif %}">
+                    <strong class="me-auto">알림</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {{ message }}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
 <script>
     // 매장 소유자 체크박스 상태에 따라 매장 정보 섹션 표시/숨김
     document.addEventListener('DOMContentLoaded', function() {

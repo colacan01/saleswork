@@ -46,38 +46,41 @@ def profile_edit_view(request):
         user_form = UserUpdateForm(request.POST, instance=request.user)
         profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         
-        # 매장 소유자인 경우에만 store_form 처리
+        # POST 데이터에서 매장 소유자 여부 확인 (체크박스)
+        is_owner = 'is_store_owner' in request.POST
+        
+        # 매장 폼 처리
         store_form = None
-        if 'is_store_owner' in request.POST:
+        if is_owner:
             if store:
                 store_form = StoreForm(request.POST, instance=store)
             else:
                 store_form = StoreForm(request.POST)
         
         forms_valid = user_form.is_valid() and profile_form.is_valid()
-        if store_form:
+        if is_owner and store_form:
             forms_valid = forms_valid and store_form.is_valid()
             
         if forms_valid:
             user = user_form.save()
             profile = profile_form.save(commit=False)
+            profile.is_store_owner = is_owner  # 체크박스 상태 명시적 지정
             
             # 프로필 이미지 저장 경로 확인 및 생성
             if 'profile_image' in request.FILES:
-                # 기본 미디어 경로에서 프로필 이미지가 저장될 경로 가져오기
-                # 일반적으로 모델에서 정의한 upload_to 경로를 사용합니다
                 upload_path = os.path.join(settings.MEDIA_ROOT, 'profile_images')
                 if not os.path.exists(upload_path):
                     os.makedirs(upload_path, exist_ok=True)
             
             # Store 정보 저장
-            if profile.is_store_owner and store_form:
+            if is_owner and store_form:
                 if store:
-                    store_form.save()
+                    store = store_form.save()  # 변수에 저장된 인스턴스 갱신
+                    profile.store = store  # 프로필에 연결
                 else:
                     new_store = store_form.save()
                     profile.store = new_store
-            elif not profile.is_store_owner:
+            elif not is_owner:
                 profile.store = None
                 
             profile.save()
