@@ -13,6 +13,14 @@
     <div class="card mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label for="start_date" class="form-label">시작일자</label>
+                    <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request.GET.start_date }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="end_date" class="form-label">종료일자</label>
+                    <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request.GET.end_date }}">
+                </div>
                 <div class="col-md-4">
                     <label for="payment_method" class="form-label">결제수단</label>
                     <select name="payment_method" id="payment_method" class="form-select">
@@ -23,7 +31,7 @@
                     </select>
                 </div>
                 <div class="col-12">
-                    <button type="submit" class="btn btn-sm btn-secondary">
+                    <button type="submit" class="btn btn-sm btn-warning">
                         <i class="bi bi-funnel"></i> 필터 적용
                     </button>
                     <a href="{% url 'work_item_list' %}" class="btn btn-sm btn-outline-secondary">
@@ -59,7 +67,7 @@
                     <td align="right">{{ item.labor_cost|intcomma }}</td>
                     <td align="right"><strong>{{ item.total_amount|intcomma }}</strong></td>
                     <td align="center">{{ item.get_payment_method_display }}</td>
-                    <td>{{ item.user.username }}</td>
+                    <td>{{ item.user.last_name }}{{ item.user.first_name }}</td>
                     <td>
                         <a href="{% url 'work_detail' item.id %}" class="btn btn-sm btn-outline-primary">상세보기</a>
                     </td>
@@ -74,10 +82,10 @@
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page=1{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}">처음</a>
+                <a class="page-link" href="?page=1{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">처음</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}">이전</a>
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">이전</a>
             </li>
             {% else %}
             <li class="page-item disabled">
@@ -94,10 +102,10 @@
             
             {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}">다음</a>
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">다음</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}">마지막</a>
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">마지막</a>
             </li>
             {% else %}
             <li class="page-item disabled">

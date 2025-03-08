@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from .models import WorkItem, Material, Product
 from .forms import WorkItemForm, MaterialFormSet
 from accounts.models import Store, UserProfile
+from datetime import datetime
 
 # Create your views here.
 def index(request):
@@ -33,6 +34,12 @@ def create_work_item(request):
             # 작업 내용 저장
             work_item = work_form.save(commit=False)
             work_item.user = request.user  # 현재 로그인한 사용자를 작업자로 설정
+            
+            # 사용자 프로필에서 store 정보를 가져와 저장
+            user_profile = request.user.profile
+            if hasattr(user_profile, 'store') and user_profile.store:
+                work_item.store = user_profile.store
+                
             work_item.save()
             
             # 재료 정보 저장
@@ -65,6 +72,16 @@ def work_item_list(request):
     payment_method = request.GET.get('payment_method')
     if payment_method:
         filter_params['payment_method'] = payment_method
+    
+    # 일시 필터링 추가
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    
+    if start_date:
+        filter_params['date_time__gte'] = f"{start_date} 00:00:00"
+    
+    if end_date:
+        filter_params['date_time__lte'] = f"{end_date} 23:59:59"
     
     # 작업 항목 조회 (최신순)
     work_items = WorkItem.objects.filter(**filter_params).order_by('-date_time')

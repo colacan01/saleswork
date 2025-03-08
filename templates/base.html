@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -30,6 +31,11 @@
             <a class="nav-link" href="{% url 'work_item_list' %}">작업 목록</a>
           </li>
           <!-- 추가 메뉴 항목 -->
+          {% if user.username == 'admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'sales_index' %}">매장 판매</a>
+          </li>
+          {% endif %}
         </ul>
         {% endif %}
         <ul class="navbar-nav ms-auto">
@@ -37,11 +43,16 @@
               <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
                      data-bs-toggle="dropdown" aria-expanded="false">
-                      {{ user.username }}
+                        {% if user.profile.profile_image %}
+                          <img src="{{ user.profile.profile_image.url }}" alt="Profile Image" class="rounded-circle me-2" width="30" height="30">
+                        {% endif %}
+                        {{ user.username }}
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <li><a class="dropdown-item" href="{% url 'accounts:profile_edit' %}">프로필 수정</a></li>
-                      <li><a class="dropdown-item" href="{% url 'accounts:store_edit' %}">매장 정보 관리</a></li>
+                        {% if user.profile.is_store_owner %}
+                        <li><a class="dropdown-item" href="{% url 'accounts:store_edit' %}">매장 정보 관리</a></li>
+                        {% endif %}
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">로그아웃</a></li>
                   </ul>
