@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -31,7 +32,10 @@
               <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
                      data-bs-toggle="dropdown" aria-expanded="false">
-                      {{ user.username }}
+                        {% if user.profile.profile_image %}
+                          <img src="{{ user.profile.profile_image.url }}" alt="Profile Image" class="rounded-circle me-2" width="30" height="30">
+                        {% endif %}
+                        {{ user.username }}
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <li><a class="dropdown-item" href="{% url 'accounts:profile_edit' %}">프로필 수정</a></li>
