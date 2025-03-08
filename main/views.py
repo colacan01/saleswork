@@ -104,3 +104,27 @@ def get_product_price(request, product_id):
         return JsonResponse({'price': product.unit_price})
     except Product.DoesNotExist:
         return JsonResponse({'error': '제품을 찾을 수 없습니다.'}, status=404)
+
+def search_product_by_barcode(request, barcode):
+    """
+    바코드로 제품을 검색하여 JSON 응답으로 반환합니다.
+    """
+    # Debug: Print barcode to console
+    print(f"Searching for product with barcode: {barcode}")
+    try:
+        product = Product.objects.get(barcode=barcode)
+        print(f"Found product: {product}")
+        return JsonResponse({
+            'success': True,
+            'product': {
+                'id': product.id,
+                'name': product.name,
+                'price': float(product.sale_price),  # Decimal을 float로 변환
+                'barcode': product.barcode,
+                # 필요한 다른 제품 필드도 추가 가능
+            }
+        })
+    except Product.DoesNotExist:
+        return JsonResponse({'success': False, 'message': '바코드와 일치하는 제품이 없습니다.'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'오류가 발생했습니다: {str(e)}'})

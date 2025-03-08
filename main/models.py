@@ -44,6 +44,7 @@ class Product(models.Model):
     image = models.ImageField(verbose_name='상품 이미지', upload_to='products/', blank=True, null=True)
     stock_quantity = models.PositiveIntegerField(verbose_name='재고 수량')
     store = models.ForeignKey(Store, verbose_name='매장', on_delete=models.CASCADE, blank=True, null=True)  # 매장 필드 추가
+    barcode = models.CharField(verbose_name='바코드', max_length=100, blank=True, null=True)
     
     def __str__(self):
         return self.name

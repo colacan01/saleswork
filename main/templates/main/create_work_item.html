@@ -41,6 +41,151 @@
                 </button>
             </div>
             <div class="card-body">
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text">바코드 스캔</span>
+                        <input type="text" class="form-control" id="barcode-input" placeholder="바코드를 스캔하거나 입력하세요" autocomplete="off">
+                        <button class="btn btn-outline-secondary" type="button" id="barcode-search">검색</button>
+                    </div>
+                    <small class="form-text text-muted">바코드를 스캔하면 재료가 자동으로 추가됩니다.</small>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const barcodeInput = document.getElementById('barcode-input');
+                        const barcodeSearchBtn = document.getElementById('barcode-search');
+                        
+                        // 숫자만 입력 허용
+                        barcodeInput.addEventListener('input', function(e) {
+                            this.value = this.value.replace(/[^0-9]/g, '');
+                        });
+                        
+                        // 엔터키 처리
+                        barcodeInput.addEventListener('keypress', function(e) {
+                            if (e.key === 'Enter' && this.value.trim() !== '') {
+                                e.preventDefault();
+                                searchProductByBarcode(this.value);
+                                this.value = '';
+                            }
+                        });
+                        
+                        // 검색 버튼 클릭
+                        barcodeSearchBtn.addEventListener('click', function() {
+                            if (barcodeInput.value.trim() !== '') {
+                                searchProductByBarcode(barcodeInput.value);
+                                barcodeInput.value = '';
+                            }
+                        });
+                        
+                        // 바코드로 제품 검색
+                        function searchProductByBarcode(barcode) {
+                            console.log('바코드 검색:', barcode);
+                            fetch(`/search-product-by-barcode/${barcode}/`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success && data.product) {
+                                        addMaterialWithProduct(data.product);
+                                    } else {
+                                        alert('바코드와 일치하는 제품을 찾을 수 없습니다.');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('바코드 검색 오류:', error);
+                                    alert('제품 검색 중 오류가 발생했습니다.');
+                                });
+                        }
+                        
+                        // 제품 정보로 재료 추가
+                        function addMaterialWithProduct(product) {
+                            // 이미 추가된 상품인지 확인
+                            const existingRows = document.querySelectorAll('.material-form:not([style*="display: none"])');
+                            let existingRow = null;
+                            
+                            for (const row of existingRows) {
+                                const productSelect = row.querySelector('select[name$="-product"]');
+                                if (productSelect && productSelect.value == product.id) {
+                                    existingRow = row;
+                                    break;
+                                }
+                            }
+                            
+                            // 이미 추가된 상품이면 수량만 증가
+                            if (existingRow) {
+                                const quantityInput = existingRow.querySelector('input[name$="-quantity"]');
+                                if (quantityInput) {
+                                    const currentQuantity = parseFloat(quantityInput.value) || 0;
+                                    quantityInput.value = currentQuantity + 1;
+                                    
+                                    // 수량 변경 이벤트 발생시켜 합계 다시 계산
+                                    const event = new Event('input', { bubbles: true });
+                                    quantityInput.dispatchEvent(event);
+                                }
+                                return;
+                            }
+                            
+                            // 중복 상품이 없는 경우 기존 로직 수행
+                            // 첫 번째 행의 제품 선택란이 비어있는지 확인
+                            const firstRow = document.querySelector('.material-form');
+                            const firstProductSelect = firstRow.querySelector('select[name$="-product"]');
+                            
+                            let targetRow;
+                            
+                            // 첫 번째 행의 제품 선택란이 비어있으면 해당 행 사용
+                            if (firstProductSelect && !firstProductSelect.value) {
+                                targetRow = firstRow;
+                            } else {
+                                // 제품이 이미 선택되어 있으면 새 행 추가
+                                document.getElementById('add-material').click();
+                                
+                                // 마지막 행 선택
+                                const rows = document.querySelectorAll('.material-form');
+                                targetRow = rows[rows.length - 1];
+                            }
+                            
+                            // 제품 선택 및 단가 입력
+                            const productSelect = targetRow.querySelector('select[name$="-product"]');
+                            const quantityInput = targetRow.querySelector('input[name$="-quantity"]');
+                            const unitPriceInput = targetRow.querySelector('input[name$="-unit_price"]');
+                            
+                            // 제품 ID로 옵션 선택
+                            if (productSelect) {
+                                productSelect.value = product.id;
+                                
+                                // 기본 수량을 1로 설정
+                                if (quantityInput) {
+                                    quantityInput.value = 1;
+                                }
+                                
+                                // 단가 가져오기
+                                fetch(`/get-product-price/${product.id}/`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.price !== undefined) {
+                                            // 단가 설정
+                                            if (unitPriceInput) {
+                                                unitPriceInput.value = data.price;
+                                            }
+                                            
+                                            // 행 합계 계산
+                                            calculateRowTotal(targetRow);
+                                            
+                                            // 전체 재료비 및 총액 업데이트
+                                            calculateTotalMaterialCost();
+                                            updateGrandTotal();
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('제품 가격을 가져오는 중 오류 발생:', error);
+                                        
+                                        // 오류가 발생해도 행 합계와 전체 합계는 계산
+                                        calculateRowTotal(targetRow);
+                                        calculateTotalMaterialCost();
+                                        updateGrandTotal();
+                                    });
+                            }
+                        }
+                    });
+                </script>
                 {{ material_formset.management_form }}
                 
                 <table class="table table-bordered" id="material-table">
@@ -79,7 +224,8 @@
                                 <div class="form-control total-price" readonly>0</div>
                             </td>
                             <td class="text-center">
-                                <div class="form-check">
+                                <button type="button" class="btn btn-sm btn-danger delete-material"><i class="bi bi-trash"></i> 삭제</button>
+                                <div style="display: none;">
                                     {{ form.DELETE }}
                                 </div>
                             </td>
@@ -121,7 +267,7 @@
         </div>
 
         <div class="mt-4">
-            <button type="submit" class="btn btn-success">저장하기</button>
+            <button type="submit" class="btn btn-success"><i class="bi bi-floppy"></i> 저장하기</button>
             <a href="{% url 'work_item_list' %}" class="btn btn-secondary">취소</a>
         </div>
     </form>
@@ -187,20 +333,75 @@
             calculateTotalMaterialCost();
         });
         
-        // 삭제 체크박스 처리
-        document.querySelector('#material-tbody').addEventListener('change', function(event) {
-            if (event.target.type === 'checkbox' && event.target.name.includes('DELETE')) {
+        // 삭제 버튼 이벤트 처리 (새로 추가)
+        document.querySelector('#material-tbody').addEventListener('click', function(event) {
+            if (event.target.classList.contains('delete-material')) {
                 const row = event.target.closest('tr');
-                if (event.target.checked) {
-                    row.style.textDecoration = 'line-through';
-                    row.style.opacity = '0.5';
+                
+                // 현재 표시되고 있는(숨김 처리되지 않은) 행의 수를 확인
+                const visibleRows = document.querySelectorAll('.material-form:not([style*="display: none"])');
+                
+                // 마지막 남은 행인 경우 (행이 1개만 남았을 때)
+                if (visibleRows.length === 1) {
+                    // 행을 삭제하는 대신 모든 입력값 초기화
+                    const formElements = row.querySelectorAll('input:not([type="hidden"]), select');
+                    formElements.forEach(element => {
+                        if (element.tagName === 'SELECT') {
+                            element.selectedIndex = 0; // 선택 초기화
+                        } else if (element.type === 'checkbox') {
+                            element.checked = false;
+                        } else {
+                            element.value = '';
+                        }
+                    });
+                    
+                    // 숨겨진 행 모두 제거
+                    const hiddenRows = document.querySelectorAll('.material-form[style*="display: none"]');
+                    hiddenRows.forEach(hiddenRow => {
+                        hiddenRow.remove(); // DOM에서 완전히 제거
+                    });
+                    
+                    // ID와 name을 인덱스 0으로 재설정
+                    const allElements = row.querySelectorAll('input, select');
+                    allElements.forEach(element => {
+                        if (element.id) {
+                            element.id = element.id.replace(/-\d+-/, '-0-');
+                        }
+                        if (element.name) {
+                            element.name = element.name.replace(/-\d+-/, '-0-');
+                        }
+                    });
+                    
+                    // 총 폼 개수 1로 재설정 (첫 번째 행만 남김)
+                    document.querySelector('#id_materials-TOTAL_FORMS').value = 1;
+                    
+                    // 합계 초기화
+                    const totalElement = row.querySelector('.total-price');
+                    if (totalElement) {
+                        totalElement.textContent = '0';
+                    }
+                    
+                    // DELETE 체크박스 초기화 (삭제 취소)
+                    const checkbox = row.querySelector('input[name$="-DELETE"]');
+                    if (checkbox) {
+                        checkbox.checked = false;
+                    }
                 } else {
-                    row.style.textDecoration = 'none';
-                    row.style.opacity = '1';
+                    // 여러 행이 있는 경우 기존 방식대로 행 숨김 처리
+                    const checkbox = row.querySelector('input[name$="-DELETE"]');
+                    
+                    // DELETE 체크박스를 체크
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                    
+                    // 시각적으로 행 제거 (DOM에서 실제로 제거하지는 않음)
+                    row.style.display = 'none';
                 }
                 
                 // 전체 재료비 다시 계산
                 calculateTotalMaterialCost();
+                updateGrandTotal();
             }
         });
 
@@ -290,7 +491,7 @@
     
     // 전체 재료비 계산 후 작업정보 섹션의 재료비 입력란에 설정
     function calculateTotalMaterialCost() {
-        const totalElements = document.querySelectorAll('.material-form:not(.d-none) .total-price');
+        const totalElements = document.querySelectorAll('.material-form:not([style*="display: none"]) .total-price');
         let totalCost = 0;
         
         totalElements.forEach(element => {
