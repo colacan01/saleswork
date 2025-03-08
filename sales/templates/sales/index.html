@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}작업 목록{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="header text-center">
+            <h1>판매 관리 시스템</h1>
+            <p class="lead">판매 데이터와 통계를 확인할 수 있습니다.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>최근 판매 현황</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>이곳에 최근 판매 데이터가 표시됩니다.</p>
+                        <!-- 여기에 데이터 표시 영역 추가 예정 -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>판매 통계</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>이곳에 판매 통계가 표시됩니다.</p>
+                        <!-- 여기에 통계 표시 영역 추가 예정 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>빠른 메뉴</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary">새 판매 등록</button>
+                            <button type="button" class="btn btn-secondary">고객 관리</button>
+                            <button type="button" class="btn btn-info">제품 관리</button>
+                            <button type="button" class="btn btn-success">보고서</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
