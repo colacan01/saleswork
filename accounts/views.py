@@ -65,58 +65,62 @@ def profile_edit_view(request):
     return render(request, 'accounts/profile_edit.html', context)
 
 @login_required
-def store_edit_view(request):
-    # 사용자가 소유한 매장 찾기
-    store = Store.objects.filter(owner=request.user).first()
+def store_list_view(request):
+    # 초기 쿼리셋 (전체 매장)
+    queryset = Store.objects.all()
     
+    # 검색 기능 구현
+    search_name = request.GET.get('name', '')
+    search_business_id = request.GET.get('business_id', '')
+    
+    if search_name:
+        queryset = queryset.filter(name__icontains=search_name)
+    if search_business_id:
+        queryset = queryset.filter(business_id__icontains=search_business_id)
+    
+    # 생성/수정 폼 처리
     if request.method == 'POST':
-        # POST 데이터에서 매장 소유자 여부 확인 (체크박스)
-        is_owner = 'is_store_owner' in request.POST
+        store_id = request.POST.get('store_id')
         
-        # 매장 폼 처리
-        store_form = None
-        if is_owner:
-            if store:
-                store_form = StoreForm(request.POST, instance=store)
-            else:
-                store_form = StoreForm(request.POST)
-        
-        # 매장 정보 저장
-        if is_owner and store_form and store_form.is_valid():
-            if store:
-                store = store_form.save(commit=False)
+        # 수정인 경우 기존 매장 가져오기
+        if store_id:
+            try:
+                store = Store.objects.get(id=store_id)
+                form = StoreForm(request.POST, instance=store)
+            except Store.DoesNotExist:
+                form = StoreForm(request.POST)
+        else:
+            # 새로운 매장 생성
+            form = StoreForm(request.POST)
+            
+        if form.is_valid():
+            store = form.save(commit=False)
+            if not store_id:  # 새로운 매장일 경우
                 store.owner = request.user
-                store.save()
-            else:
-                new_store = store_form.save(commit=False)
-                new_store.owner = request.user
-                new_store.save()
-            
-            # 프로필에 매장 소유자 상태 업데이트
-            profile = request.user.profile
-            profile.is_store_owner = True
-            profile.save()
-            
-            messages.success(request, '매장 정보가 성공적으로 업데이트되었습니다!')
-            return redirect('accounts:store_edit')
-        elif not is_owner:
-            # 소유자 아니라고 표시했으면 연결된 매장 소유권 제거
-            if store:
-                store.owner = None
-                store.save()
-            
-            # 프로필에 매장 소유자 상태 업데이트
-            profile = request.user.profile
-            profile.is_store_owner = False
-            profile.save()
-            
-            messages.success(request, '매장 소유자 상태가 변경되었습니다.')
-            return redirect('accounts:store_edit')
+            store.save()
+            messages.success(request, '매장 정보가 성공적으로 저장되었습니다!')
+            return redirect('accounts:store_list')
     else:
-        store_form = StoreForm(instance=store) if store else StoreForm()
+        form = StoreForm()  # 새로운 빈 폼
     
     context = {
-        'store_form': store_form,
-        # 'has_store': store is not None
+        'stores': queryset,
+        'form': form,
+        'search_name': search_name,
+        'search_business_id': search_business_id
     }
-    return render(request, 'accounts/store_edit.html', context)
+    return render(request, 'accounts/store_list.html', context)
+
+@login_required
+def store_delete_view(request, store_id):
+    try:
+        store = Store.objects.get(id=store_id)
+        store_name = store.name  # 삭제 전에 매장 이름 저장
+        store.delete()
+        messages.success(request, f'{store_name} 매장이 성공적으로 삭제되었습니다.')
+    except Store.DoesNotExist:
+        messages.error(request, '삭제할 매장을 찾을 수 없습니다.')
+    
+    return redirect('accounts:store_list')
+
+

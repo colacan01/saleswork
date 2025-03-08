@@ -51,7 +51,7 @@
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <li><a class="dropdown-item" href="{% url 'accounts:profile_edit' %}">프로필 수정</a></li>
                         {% if user.is_superuser %}
-                        <li><a class="dropdown-item" href="{% url 'accounts:store_edit' %}">매장 정보 관리</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:store_list' %}">매장 정보 관리</a></li>
                         {% endif %}
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">로그아웃</a></li>
