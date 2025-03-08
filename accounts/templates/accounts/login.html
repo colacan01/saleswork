@@ -1,26 +1,26 @@
 {% extends 'base.html' %}
-
+{% load i18n %}
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">로그인</div>
+                <div class="card-header">{% trans "로그인" %}</div>
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
                         <div class="form-group mb-3">
-                            <label for="username">아이디</label>
+                            <label for="username">{% trans "아이디" %}</label>
                             <input type="text" name="username" class="form-control" required>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="password">비밀번호</label>
+                            <label for="password">{% trans "비밀번호" %}</label>
                             <input type="password" name="password" class="form-control" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">로그인</button>
+                        <button type="submit" class="btn btn-primary">{% trans "로그인" %}</button>
                     </form>
                     <div class="mt-3">
-                        <p>계정이 없으신가요? <a href="{% url 'accounts:register' %}">회원가입</a></p>
+                        <p>{% trans "계정이 없으신가요?" %} <a href="{% url 'accounts:register' %}">{% trans "회원가입" %}</a></p>
                     </div>
                 </div>
             </div>

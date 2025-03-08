@@ -18,13 +18,24 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
 
 urlpatterns = [
+    path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
     path('accounts/', include('accounts.urls')),
     path('sales/', include('sales.urls')),
 ]
+
+# 다국어 적용이 필요한 URL 패턴들
+urlpatterns += i18n_patterns(
+    path('admin/', admin.site.urls),
+    path('', include('main.urls')),
+    path('accounts/', include('accounts.urls')),
+    path('sales/', include('sales.urls')),
+    prefix_default_language=True  # 기본 언어도 URL에 접두어로 표시
+)
 
 #미디어/static 파일 패턴 추가
 if settings.DEBUG:

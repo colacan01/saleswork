@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware', 
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -106,12 +108,25 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
+LANGUAGES = [
+    ('ko', '한국어'),
+    ('en', 'English'),
+    ('vi', 'Tiếng Việt'),
+    # 필요한 언어 추가
+]
 
-LANGUAGE_CODE = 'ko-kr'
+LANGUAGE_CODE = 'ko'
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale/'),
+]
+
+USE_I18N = True  # 국제화 활성화
+USE_L10N = True  # 지역화 활성화
 
 TIME_ZONE = 'Asia/Seoul'
 
-USE_I18N = True
+# USE_I18N = True
 
 USE_TZ = True
 

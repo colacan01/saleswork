@@ -6,6 +6,7 @@ from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, StoreFor
 from .models import Store
 import os
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 def register_view(request):
     if request.method == 'POST':
@@ -13,7 +14,7 @@ def register_view(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
-            messages.success(request, f'{username}님, 회원가입이 완료되었습니다! 로그인 해주세요.')
+            messages.success(request, _('{username}님, 회원가입이 완료되었습니다! 로그인 해주세요.').format(username=username))
             return redirect('accounts:login')
     else:
         form = UserRegisterForm()
@@ -28,7 +29,7 @@ def login_view(request):
             login(request, user)
             return redirect('/')  # 메인 페이지로 리디렉션
         else:
-            messages.error(request, '아이디 또는 비밀번호가 올바르지 않습니다.')
+            messages.error(request, _('아이디 또는 비밀번호가 올바르지 않습니다.'))
     return render(request, 'accounts/login.html')
 
 def logout_view(request):
@@ -52,7 +53,7 @@ def profile_edit_view(request):
                     os.makedirs(upload_path, exist_ok=True)
             
             profile.save()
-            messages.success(request, '프로필이 성공적으로 업데이트되었습니다!')
+            messages.success(request, _('프로필이 성공적으로 업데이트되었습니다!'))
             return redirect('accounts:profile_edit')
     else:
         user_form = UserUpdateForm(instance=request.user)
@@ -98,7 +99,7 @@ def store_list_view(request):
             if not store_id:  # 새로운 매장일 경우
                 store.owner = request.user
             store.save()
-            messages.success(request, '매장 정보가 성공적으로 저장되었습니다!')
+            messages.success(request, _('매장 정보가 성공적으로 저장되었습니다!'))
             return redirect('accounts:store_list')
     else:
         form = StoreForm()  # 새로운 빈 폼
@@ -117,10 +118,8 @@ def store_delete_view(request, store_id):
         store = Store.objects.get(id=store_id)
         store_name = store.name  # 삭제 전에 매장 이름 저장
         store.delete()
-        messages.success(request, f'{store_name} 매장이 성공적으로 삭제되었습니다.')
+        messages.success(request, _('"{store_name}" 매장이 성공적으로 삭제되었습니다.').format(store_name=store_name))
     except Store.DoesNotExist:
-        messages.error(request, '삭제할 매장을 찾을 수 없습니다.')
+        messages.error(request, _('삭제할 매장을 찾을 수 없습니다.'))
     
     return redirect('accounts:store_list')
-
-
