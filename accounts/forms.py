@@ -37,9 +37,16 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['profile_image', 'is_store_owner', 'phone_number', 'address', 'birth_date', 'bio']
+        labels = {
+            'profile_image': '프로필 이미지',
+            'is_store_owner': '매장 소유자 여부',
+            'phone_number': '전화번호',
+            'address': '주소',
+            'birth_date': '생일',
+            'bio': '기타 정보'
+        }
         widgets = {
             'birth_date': forms.DateInput(attrs={'type': 'date'}),
-            # 'is_store_owner': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         
     def __init__(self, *args, **kwargs):

@@ -37,13 +37,39 @@ def logout_view(request):
 
 @login_required
 def profile_edit_view(request):
-    # Store 정보 처리 로직 수정 - 이제 사용자가 소유한 매장을 찾음
-    store = Store.objects.filter(owner=request.user).first()
-    
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
         profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save()
+            profile = profile_form.save(commit=False)
+            
+            # 프로필 이미지 저장 경로 확인 및 생성
+            if 'profile_image' in request.FILES:
+                upload_path = os.path.join(settings.MEDIA_ROOT, 'profile_images')
+                if not os.path.exists(upload_path):
+                    os.makedirs(upload_path, exist_ok=True)
+            
+            profile.save()
+            messages.success(request, '프로필이 성공적으로 업데이트되었습니다!')
+            return redirect('accounts:profile_edit')
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = ProfileUpdateForm(instance=request.user.profile)
+    
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    }
+    return render(request, 'accounts/profile_edit.html', context)
+
+@login_required
+def store_edit_view(request):
+    # 사용자가 소유한 매장 찾기
+    store = Store.objects.filter(owner=request.user).first()
+    
+    if request.method == 'POST':
         # POST 데이터에서 매장 소유자 여부 확인 (체크박스)
         is_owner = 'is_store_owner' in request.POST
         
@@ -55,48 +81,42 @@ def profile_edit_view(request):
             else:
                 store_form = StoreForm(request.POST)
         
-        forms_valid = user_form.is_valid() and profile_form.is_valid()
-        if is_owner and store_form:
-            forms_valid = forms_valid and store_form.is_valid()
+        # 매장 정보 저장
+        if is_owner and store_form and store_form.is_valid():
+            if store:
+                store = store_form.save(commit=False)
+                store.owner = request.user
+                store.save()
+            else:
+                new_store = store_form.save(commit=False)
+                new_store.owner = request.user
+                new_store.save()
             
-        if forms_valid:
-            user = user_form.save()
-            profile = profile_form.save(commit=False)
-            profile.is_store_owner = is_owner  # 체크박스 상태 명시적 지정
+            # 프로필에 매장 소유자 상태 업데이트
+            profile = request.user.profile
+            profile.is_store_owner = True
+            profile.save()
             
-            # 프로필 이미지 저장 경로 확인 및 생성
-            if 'profile_image' in request.FILES:
-                upload_path = os.path.join(settings.MEDIA_ROOT, 'profile_images')
-                if not os.path.exists(upload_path):
-                    os.makedirs(upload_path, exist_ok=True)
-            
-            # Store 정보 저장 - 변경된 관계 모델에 맞게 수정
-            if is_owner and store_form:
-                if store:
-                    store = store_form.save(commit=False)
-                    store.owner = user  # 소유자를 현재 사용자로 설정
-                    store.save()
-                else:
-                    new_store = store_form.save(commit=False)
-                    new_store.owner = user  # 소유자를 현재 사용자로 설정
-                    new_store.save()
-            elif not is_owner and store:
-                # 소유자 아니라고 표시했으면 연결된 매장 소유권 제거
+            messages.success(request, '매장 정보가 성공적으로 업데이트되었습니다!')
+            return redirect('accounts:store_edit')
+        elif not is_owner:
+            # 소유자 아니라고 표시했으면 연결된 매장 소유권 제거
+            if store:
                 store.owner = None
                 store.save()
-                
+            
+            # 프로필에 매장 소유자 상태 업데이트
+            profile = request.user.profile
+            profile.is_store_owner = False
             profile.save()
-            messages.success(request, '프로필이 성공적으로 업데이트되었습니다!')
-            return redirect('accounts:profile_edit')
+            
+            messages.success(request, '매장 소유자 상태가 변경되었습니다.')
+            return redirect('accounts:store_edit')
     else:
-        user_form = UserUpdateForm(instance=request.user)
-        profile_form = ProfileUpdateForm(instance=request.user.profile)
         store_form = StoreForm(instance=store) if store else StoreForm()
     
     context = {
-        'user_form': user_form,
-        'profile_form': profile_form,
         'store_form': store_form,
-        'has_store': store is not None
+        # 'has_store': store is not None
     }
-    return render(request, 'accounts/profile_edit.html', context)
+    return render(request, 'accounts/store_edit.html', context)
