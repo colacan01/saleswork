@@ -5,7 +5,7 @@ from datetime import datetime
 class WorkItemForm(forms.ModelForm):
     class Meta:
         model = WorkItem
-        fields = ['date_time', 'customer_phone', 'work_name', 'material_cost', 'labor_cost', 
+        fields = ['date_time', 'customer_phone', 'work_name', 'labor_cost', 'material_cost', 
                  'payment_method', 'notes']
         widgets = {
             'date_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
@@ -27,6 +27,9 @@ class WorkItemForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': self.fields[fieldname].label or fieldname.replace('_', ' ').title()
             })
+        
+        # material_cost 필드를 읽기 전용으로 설정
+        self.fields['material_cost'].widget.attrs['readonly'] = True
 
 class MaterialForm(forms.ModelForm):
     class Meta:
