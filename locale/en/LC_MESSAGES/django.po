@@ -1855,8 +1855,8 @@ msgid "판매/작업 관리"
 msgstr "Sales/Work Management"
 
 #: .\templates\base.html:40
-msgid "[dev] 매장 판매"
-msgstr "[dev] Store Sales"
+msgid "매장 판매"
+msgstr "Store Sales"
 
 #: .\templates\base.html:65
 msgid "프로필 수정"
