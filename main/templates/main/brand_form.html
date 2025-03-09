@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">{{ title }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.name.id_for_label }}" class="form-label">브랜드명 *</label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <div class="text-danger">{{ form.name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.supplier.id_for_label }}" class="form-label">공급업체</label>
+                                    {{ form.supplier }}
+                                    {% if form.supplier.errors %}
+                                        <div class="text-danger">{{ form.supplier.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="{{ form.description.id_for_label }}" class="form-label">설명</label>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                        <div class="text-danger">{{ form.description.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.website.id_for_label }}" class="form-label">웹사이트</label>
+                                    {{ form.website }}
+                                    {% if form.website.errors %}
+                                        <div class="text-danger">{{ form.website.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    {{ form.is_active }}
+                                    <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                        활성화 상태
+                                    </label>
+                                    {% if form.is_active.errors %}
+                                        <div class="text-danger">{{ form.is_active.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.logo.id_for_label }}" class="form-label">브랜드 로고</label>
+                            {% if form.instance.logo %}
+                            <div class="mb-2">
+                                <img src="{{ form.instance.logo.url }}" alt="현재 로고" style="max-height: 100px;">
+                                <p class="form-text">새 이미지를 업로드하면 기존 이미지가 대체됩니다.</p>
+                            </div>
+                            {% endif %}
+                            {{ form.logo }}
+                            {% if form.logo.errors %}
+                                <div class="text-danger">{{ form.logo.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">{{ form.logo.help_text }}</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'brand-list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> 취소
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if is_update %}
+                                    <i class="bi bi-save"></i> 수정 완료
+                                {% else %}
+                                    <i class="bi bi-plus-circle"></i> 브랜드 등록
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // 폼 필드 스타일 적용
+    document.addEventListener('DOMContentLoaded', function() {
+        // 모든 텍스트 기반 입력 필드에 form-control 클래스 추가
+        const formControls = document.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), textarea, select');
+        formControls.forEach(function(el) {
+            el.classList.add('form-control');
+            
+            // 필수 필드에 대한 표시 추가
+            if (el.required) {
+                el.classList.add('required-field');
+            }
+            
+            // 이미 검증 오류가 있는 필드는 표시
+            if (el.closest('.mb-3')?.querySelector('.text-danger')) {
+                el.classList.add('is-invalid');
+            }
+        });
+        
+        // 특별히 파일 입력 필드에 추가 클래스
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(function(el) {
+            el.classList.add('form-control');
+        });
+        
+        // 체크박스에 form-check-input 클래스 추가
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(function(el) {
+            el.classList.add('form-check-input');
+        });
+        
+        // 입력 시 실시간 검증 상태 업데이트
+        formControls.forEach(function(el) {
+            el.addEventListener('input', function() {
+                if (this.value) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else if (this.required) {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+    });
+</script>
+<style>
+    /* 필수 필드 표시 스타일 */
+    label.form-label:has(+ .required-field)::after,
+    label.form-label:has(+ input.required-field)::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    /* 텍스트 영역 높이 조정 */
+    textarea.form-control {
+        min-height: 100px;
+    }
+    
+    /* 입력 필드 포커스 효과 개선 */
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}브랜드 삭제{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">브랜드 삭제</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        이 작업은 되돌릴 수 없습니다.
+                    </div>
+                    
+                    <h5>다음 브랜드를 삭제하시겠습니까?</h5>
+                    <div class="d-flex align-items-center mt-3 mb-4">
+                        {% if brand.logo %}
+                            <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" style="max-height: 50px; margin-right: 15px;">
+                        {% else %}
+                            <i class="bi bi-building me-3" style="font-size: 2rem;"></i>
+                        {% endif %}
+                        <div>
+                            <h4 class="mb-0">{{ brand.name }}</h4>
+                            {% if brand.supplier %}
+                                <p class="text-muted mb-0">공급처: {{ brand.supplier.name }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-danger">
+                        <p><strong>주의:</strong> 이 브랜드와 관련된 모든 제품 정보가 영향을 받을 수 있습니다.</p>
+                        <p class="mb-0">제품 정보는 삭제되지 않지만 브랜드 정보는 더 이상 표시되지 않습니다.</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'brand-detail' brand.id %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> 취소
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> 브랜드 삭제
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

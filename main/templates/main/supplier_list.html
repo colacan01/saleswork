@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}공급처 목록 - 판매관리 시스템{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ title }}</h2>
+        <a href="{% url 'supplier-create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> 공급처 추가
+        </a>
+    </div>
+
+    <!-- 검색 영역 추가 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">공급처 검색</h5>
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <label for="search_name" class="form-label">공급처명</label>
+                    <input type="text" class="form-control" id="search_name" name="search_name" 
+                           value="{{ request.GET.search_name|default:'' }}" placeholder="공급처명으로 검색...">
+                </div>
+                <div class="col-md-2">
+                    <label for="is_active" class="form-label">상태</label>
+                    <select name="is_active" id="is_active" class="form-select">
+                        <option value="">모든 상태</option>
+                        <option value="True" {% if request.GET.is_active == 'True' %}selected{% endif %}>활성</option>
+                        <option value="False" {% if request.GET.is_active == 'False' %}selected{% endif %}>비활성</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="d-grid gap-2 d-md-flex w-100">
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            <i class="bi bi-search"></i> 검색
+                        </button>
+                        <a href="{% url 'supplier-list' %}" class="btn btn-outline-secondary flex-grow-1">
+                            <i class="bi bi-arrow-counterclockwise"></i> 초기화
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if suppliers %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>공급처명</th>
+                    <th>사업자번호</th>
+                    <th>연락처</th>
+                    <th>담당자</th>
+                    <th>상태</th>
+                    <th>관리</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for supplier in suppliers %}
+                <tr>
+                    <td>
+                        <a href="{% url 'supplier-detail' supplier.id %}">{{ supplier.name }}</a>
+                    </td>
+                    <td>{{ supplier.business_number|default:"-" }}</td>
+                    <td>{{ supplier.contact_info|default:"-" }}</td>
+                    <td>{{ supplier.contact_person|default:"-" }}</td>
+                    <td>
+                        {% if supplier.is_active %}
+                            <span class="badge bg-success">활성</span>
+                        {% else %}
+                            <span class="badge bg-danger">비활성</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'supplier-update' supplier.id %}" class="btn btn-outline-primary">수정</a>
+                            <a href="{% url 'supplier-delete' supplier.id %}" class="btn btn-outline-danger">삭제</a>
+                            <a href="{% url 'brand-list' %}?supplier={{ supplier.id }}" class="btn btn-outline-info">브랜드</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        등록된 공급처가 없습니다. 새 공급처를 추가해 주세요.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

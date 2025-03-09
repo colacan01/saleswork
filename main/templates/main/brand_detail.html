@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ title }}</h2>
+        <div>
+            <a href="{% url 'brand-update' brand.id %}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> 수정
+            </a>
+            <a href="{% url 'brand-delete' brand.id %}" class="btn btn-danger">
+                <i class="bi bi-trash"></i> 삭제
+            </a>
+            <a href="{% url 'brand-list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> 목록으로
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                {% if brand.logo %}
+                <img src="{{ brand.logo.url }}" class="card-img-top" alt="{{ brand.name }}">
+                {% else %}
+                <div class="card-img-top bg-light text-center py-5">
+                    <i class="bi bi-building" style="font-size: 5rem;"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h3 class="card-title">
+                        {{ brand.name }}
+                        {% if brand.is_active %}
+                            <span class="badge bg-success">활성</span>
+                        {% else %}
+                            <span class="badge bg-danger">비활성</span>
+                        {% endif %}
+                    </h3>
+                    <p class="card-text">{{ brand.description|default:"브랜드 설명이 없습니다."|linebreaks }}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>공급처:</strong>
+                        {% if brand.supplier %}
+                            <a href="{% url 'supplier-detail' brand.supplier.id %}">{{ brand.supplier.name }}</a>
+                        {% else %}
+                            <span class="text-muted">미지정</span>
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>웹사이트:</strong>
+                        {% if brand.website %}
+                            <a href="{{ brand.website }}" target="_blank">{{ brand.website }}</a>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>등록일:</strong> {{ brand.created_at|date:"Y-m-d H:i" }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>최종 수정일:</strong> {{ brand.updated_at|date:"Y-m-d H:i" }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">제품 목록</h4>
+                    <a href="#" class="btn btn-sm btn-primary">제품 추가</a>
+                </div>
+                <div class="card-body">
+                    {% if products %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>제품명</th>
+                                    <th>판매가</th>
+                                    <th>재고</th>
+                                    <th>바코드</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    <td>
+                                        {% if product.image %}
+                                            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="height: 30px; margin-right: 5px;">
+                                        {% endif %}
+                                        {{ product.name }}
+                                    </td>
+                                    <td>{{ product.sale_price|floatformat:0 }}원</td>
+                                    <td>{{ product.stock_quantity }}</td>
+                                    <td>{{ product.barcode|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center py-3">이 브랜드에 등록된 제품이 없습니다.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

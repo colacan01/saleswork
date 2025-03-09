@@ -26,4 +26,18 @@ urlpatterns = [
     path('work_item_list/', views.work_item_list, name='work_item_list'),
     path('get-product-price/<int:product_id>/', views.get_product_price, name='get_product_price'),
     path('search-product-by-barcode/<str:barcode>/', views.search_product_by_barcode, name='search_product_by_barcode'),
+
+    # Supplier URLs
+    path('suppliers/', views.SupplierListView.as_view(), name='supplier-list'),
+    path('suppliers/<int:pk>/', views.SupplierDetailView.as_view(), name='supplier-detail'),
+    path('suppliers/new/', views.SupplierCreateView.as_view(), name='supplier-create'),
+    path('suppliers/<int:pk>/edit/', views.SupplierUpdateView.as_view(), name='supplier-update'),
+    path('suppliers/<int:pk>/delete/', views.SupplierDeleteView.as_view(), name='supplier-delete'),
+    
+    # Brand URLs
+    path('brands/', views.BrandListView.as_view(), name='brand-list'),
+    path('brands/<int:pk>/', views.BrandDetailView.as_view(), name='brand-detail'),
+    path('brands/new/', views.BrandCreateView.as_view(), name='brand-create'),
+    path('brands/<int:pk>/edit/', views.BrandUpdateView.as_view(), name='brand-update'),
+    path('brands/<int:pk>/delete/', views.BrandDeleteView.as_view(), name='brand-delete'),
 ]

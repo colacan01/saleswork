@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ supplier.name }} - 판매관리 시스템{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ title }}</h1>
+        <div>
+            <a href="{% url 'supplier-update' supplier.id %}" class="btn btn-primary">수정</a>
+            <a href="{% url 'supplier-list' %}" class="btn btn-secondary">목록으로</a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">기본 정보</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">공급처명</dt>
+                        <dd class="col-sm-8">{{ supplier.name }}</dd>
+                        
+                        <dt class="col-sm-4">사업자번호</dt>
+                        <dd class="col-sm-8">{{ supplier.business_number|default:"미등록" }}</dd>
+                        
+                        <dt class="col-sm-4">연락처</dt>
+                        <dd class="col-sm-8">{{ supplier.contact_info|default:"미등록" }}</dd>
+                        
+                        <dt class="col-sm-4">담당자</dt>
+                        <dd class="col-sm-8">{{ supplier.contact_person|default:"미등록" }}</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">이메일</dt>
+                        <dd class="col-sm-8">{{ supplier.email|default:"미등록" }}</dd>
+                        
+                        <dt class="col-sm-4">웹사이트</dt>
+                        <dd class="col-sm-8">
+                            {% if supplier.website %}
+                                <a href="{{ supplier.website }}" target="_blank">{{ supplier.website }}</a>
+                            {% else %}
+                                미등록
+                            {% endif %}
+                        </dd>
+                        
+                        <dt class="col-sm-4">상태</dt>
+                        <dd class="col-sm-8">
+                            {% if supplier.is_active %}
+                                <span class="badge bg-success">활성</span>
+                            {% else %}
+                                <span class="badge bg-danger">비활성</span>
+                            {% endif %}
+                        </dd>
+                        
+                        <dt class="col-sm-4">등록일</dt>
+                        <dd class="col-sm-8">{{ supplier.created_at|date:"Y-m-d" }}</dd>
+                    </dl>
+                </div>
+            </div>
+            
+            {% if supplier.address %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <strong>주소:</strong> {{ supplier.address }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">브랜드 목록</h5>
+            <a href="{% url 'brand-create' %}" class="btn btn-sm btn-primary">브랜드 추가</a>
+        </div>
+        <div class="card-body">
+            {% if brands %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>브랜드명</th>
+                                <th>활성 상태</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for brand in brands %}
+                            <tr>
+                                <td><a href="{% url 'brand-detail' brand.id %}">{{ brand.name }}</a></td>
+                                <td>
+                                    {% if brand.is_active %}
+                                        <span class="badge bg-success">활성</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">비활성</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'brand-update' brand.id %}" class="btn btn-outline-primary">수정</a>
+                                        <a href="{% url 'brand-delete' brand.id %}" class="btn btn-outline-danger">삭제</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">등록된 브랜드가 없습니다.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

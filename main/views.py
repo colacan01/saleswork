@@ -6,6 +6,12 @@ from .models import WorkItem, Material, Product
 from .forms import WorkItemForm, MaterialFormSet
 from accounts.models import Store, UserProfile
 from datetime import datetime
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
+from .models import Supplier, Brand
+from .forms import SupplierForm, BrandForm  # 폼은 별도로 생성해야 함
 
 # Create your views here.
 def index(request):
@@ -26,6 +32,7 @@ def work_detail(request, work_id):
 
 @login_required
 def create_work_item(request):
+    
     if request.method == 'POST':
         work_form = WorkItemForm(request.POST)
         material_formset = MaterialFormSet(request.POST)
@@ -49,7 +56,8 @@ def create_work_item(request):
                 return redirect('work_item_list')  # 목록 페이지로 이동
     else:
         work_form = WorkItemForm()
-        material_formset = MaterialFormSet()
+        # material_formset = MaterialFormSet()
+        material_formset = MaterialFormSet(form_kwargs={'user': request.user})  # 현재 로그인한 사용자 정보 전달
     
     return render(request, 'main/create_work_item.html', {
         'work_form': work_form,
@@ -128,3 +136,179 @@ def search_product_by_barcode(request, barcode):
         return JsonResponse({'success': False, 'message': '바코드와 일치하는 제품이 없습니다.'})
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'오류가 발생했습니다: {str(e)}'})
+
+
+# Supplier 관련 뷰
+class SupplierListView(LoginRequiredMixin, ListView):
+    model = Supplier
+    template_name = 'main/supplier_list.html'
+    context_object_name = 'suppliers'
+    
+    def get_queryset(self):
+        store = self.request.user.profile.store if hasattr(self.request.user, 'profile') else None
+        queryset = Supplier.get_active_suppliers(store=store)
+        
+        # 공급처명 검색 필터링
+        search_name = self.request.GET.get('search_name')
+        if (search_name):
+            queryset = queryset.filter(name__icontains=search_name)
+            
+        # 활성화 상태 필터링
+        is_active = self.request.GET.get('is_active')
+        if is_active == 'True':
+            queryset = queryset.filter(is_active=True)
+        elif is_active == 'False':
+            queryset = queryset.filter(is_active(False))
+            
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = '공급처 목록'
+        return context
+
+
+class SupplierDetailView(LoginRequiredMixin, DetailView):
+    model = Supplier
+    template_name = 'main/supplier_detail.html'
+    context_object_name = 'supplier'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['brands'] = self.object.get_brands()
+        context['title'] = f'{self.object.name} 상세정보'
+        return context
+
+
+class SupplierCreateView(LoginRequiredMixin, CreateView):
+    model = Supplier
+    form_class = SupplierForm
+    template_name = 'main/supplier_form.html'
+    success_url = reverse_lazy('supplier-list')
+    
+    def form_valid(self, form):
+        form.instance.store = self.request.user.profile.store if hasattr(self.request.user, 'profile') else None
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = '새 공급처 등록'
+        context['is_update'] = False
+        return context
+
+
+class SupplierUpdateView(LoginRequiredMixin, UpdateView):
+    model = Supplier
+    form_class = SupplierForm
+    template_name = 'main/supplier_form.html'
+    success_url = reverse_lazy('supplier-list')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = '공급처 정보 수정'
+        context['is_update'] = True
+        return context
+
+
+class SupplierDeleteView(LoginRequiredMixin, DeleteView):
+    model = Supplier
+    template_name = 'main/supplier_confirm_delete.html'
+    success_url = reverse_lazy('supplier-list')
+    context_object_name = 'supplier'
+
+
+# Brand 관련 뷰
+class BrandListView(LoginRequiredMixin, ListView):
+    model = Brand
+    template_name = 'main/brand_list.html'
+    context_object_name = 'brands'
+    
+    def get_queryset(self):
+        store = self.request.user.profile.store if hasattr(self.request.user, 'profile') else None
+        supplier_id = self.request.GET.get('supplier')
+        supplier = None
+        
+        if supplier_id:
+            try:
+                supplier = Supplier.objects.get(pk=supplier_id)
+            except Supplier.DoesNotExist:
+                pass
+                
+        return Brand.get_active_brands(store=store, supplier=supplier)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        store = self.request.user.profile.store if hasattr(self.request.user, 'profile') else None
+        context['suppliers'] = Supplier.get_active_suppliers(store=store)
+        context['title'] = '브랜드 목록'
+        
+        # 선택된 공급처 정보 추가
+        supplier_id = self.request.GET.get('supplier')
+        if supplier_id:
+            try:
+                context['selected_supplier'] = Supplier.objects.get(pk=supplier_id)
+            except Supplier.DoesNotExist:
+                pass
+                
+        return context
+
+
+class BrandDetailView(LoginRequiredMixin, DetailView):
+    model = Brand
+    template_name = 'main/brand_detail.html'
+    context_object_name = 'brand'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['products'] = self.object.get_products()
+        context['title'] = f'{self.object.name} 브랜드 상세정보'
+        return context
+
+
+class BrandCreateView(LoginRequiredMixin, CreateView):
+    model = Brand
+    form_class = BrandForm
+    template_name = 'main/brand_form.html'
+    success_url = reverse_lazy('brand-list')
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        store = self.request.user.profile.store if hasattr(self.request.user, 'profile') else None
+        kwargs['store'] = store  # 폼에 store 전달
+        return kwargs
+    
+    def form_valid(self, form):
+        form.instance.store = self.request.user.profile.store if hasattr(self.request.user, 'profile') else None
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = '새 브랜드 등록'
+        context['is_update'] = False
+        return context
+
+
+class BrandUpdateView(LoginRequiredMixin, UpdateView):
+    model = Brand
+    form_class = BrandForm
+    template_name = 'main/brand_form.html'
+    success_url = reverse_lazy('brand-list')
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        store = self.request.user.profile.store if hasattr(self.request.user, 'profile') else None
+        kwargs['store'] = store  # 폼에 store 전달
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = '브랜드 정보 수정'
+        context['is_update'] = True
+        return context
+
+
+class BrandDeleteView(LoginRequiredMixin, DeleteView):
+    model = Brand
+    template_name = 'main/brand_confirm_delete.html'
+    success_url = reverse_lazy('brand-list')
+    context_object_name = 'brand'
