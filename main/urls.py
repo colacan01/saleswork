@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import RedirectView
 from . import views
+from .views import ProductListView, ProductCreateView, ProductDetailView, ProductUpdateView
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -40,4 +41,10 @@ urlpatterns = [
     path('brands/new/', views.BrandCreateView.as_view(), name='brand-create'),
     path('brands/<int:pk>/edit/', views.BrandUpdateView.as_view(), name='brand-update'),
     path('brands/<int:pk>/delete/', views.BrandDeleteView.as_view(), name='brand-delete'),
+
+    # Product URLs
+    path('products/', ProductListView.as_view(), name='product_list'),
+    path('products/create/', ProductCreateView.as_view(), name='product_create'),
+    path('products/<int:pk>/', ProductDetailView.as_view(), name='product_detail'),
+    path('products/<int:pk>/update/', ProductUpdateView.as_view(), name='product_update'),
 ]

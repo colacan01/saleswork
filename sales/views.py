@@ -102,7 +102,7 @@ def sales_item_list(request):
 def get_product_price(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
-        return JsonResponse({'price': product.unit_price})
+        return JsonResponse({'price': product.sale_price})
     except Product.DoesNotExist:
         return JsonResponse({'error': '제품을 찾을 수 없습니다.'}, status=404)
 

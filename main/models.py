@@ -134,6 +134,14 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def get_store_products(cls, store=None):
+        """특정 매장의 상품 목록 반환"""
+        queryset = cls.objects.all()
+        if store:
+            queryset = queryset.filter(store=store)
+        return queryset
+
 class Material(models.Model):
     """재료 모델 클래스"""
     work_item = models.ForeignKey(WorkItem, related_name='materials', on_delete=models.CASCADE)

@@ -94,3 +94,23 @@ class BrandForm(forms.ModelForm):
         # 공급처 필터링 (매장별)
         if store:
             self.fields['supplier'].queryset = Supplier.objects.filter(store=store, is_active=True)
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'brand', 'sale_price', 'unit_price', 'stock_quantity', 'barcode', 'image']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'brand': forms.Select(attrs={'class': 'form-select'}),
+            'sale_price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'unit_price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'stock_quantity': forms.NumberInput(attrs={'class': 'form-control'}),
+            'barcode': forms.TextInput(attrs={'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 폼이 렌더링될 때 사용자의 매장 정보를 활용할 수 있도록 준비
+        self.fields['brand'].queryset = Brand.objects.all()  # 실제 사용 시에는 매장 기준으로 필터링해야 함
+        self.fields['brand'].empty_label = "브랜드 선택"

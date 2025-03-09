@@ -37,7 +37,7 @@
           <!-- 추가 메뉴 항목 -->
           {% if user.is_superuser %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'sales_item_list' %}">{% trans "[dev] 매장 판매" %}</a>
+            <a class="nav-link" href="{% url 'sales_item_list' %}">{% trans "매장 판매" %}</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'supplier-list' %}">공급처 관리</a>
@@ -45,6 +45,9 @@
           <li class="nav-item">
               <a class="nav-link" href="{% url 'brand-list' %}">브랜드 관리</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'product_list' %}">상품 관리</a>
+        </li>
           {% endif %}
         </ul>
         {% endif %}
@@ -87,16 +90,16 @@
             {% get_current_language as CURRENT_LANGUAGE %}
             {% get_available_languages as LANGUAGES %}
             {% for lang_code, lang_name in LANGUAGES %}
-              <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>
-                {{ lang_name }}
-              </option>
+                <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>
+                {% if lang_code == 'ko' %}🇰🇷{% elif lang_code == 'en' %}🇺🇸{% elif lang_code == 'ja' %}🇯🇵{% elif lang_code == 'zh-hans' %}🇨🇳{% elif lang_code == 'vi' %}🇻🇳{% else %}🌐{% endif %} {{ lang_name }}
+                </option>
             {% endfor %}
           </select>
         </form>
       </div>
     </div>
   </nav>
-
+  
   <!-- 메인 컨텐츠 -->
   {% block content %}
   {% endblock %}

@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from .models import WorkItem, Material, Product
-from .forms import WorkItemForm, MaterialFormSet
+from .forms import WorkItemForm, MaterialFormSet, ProductForm
 from accounts.models import Store, UserProfile
 from datetime import datetime
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -112,7 +112,7 @@ def work_item_list(request):
 def get_product_price(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
-        return JsonResponse({'price': product.unit_price})
+        return JsonResponse({'price': product.sale_price})
     except Product.DoesNotExist:
         return JsonResponse({'error': '제품을 찾을 수 없습니다.'}, status=404)
 
@@ -324,3 +324,77 @@ class BrandDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'main/brand_confirm_delete.html'
     success_url = reverse_lazy('brand-list')
     context_object_name = 'brand'
+
+
+# Product 관련 뷰
+class ProductListView(LoginRequiredMixin, ListView):
+    model = Product
+    template_name = 'main/product_list.html'
+    context_object_name = 'products'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        # 사용자 프로필에서 매장 정보 가져오기
+        store = None
+        if hasattr(self.request.user, 'profile'):
+            store = self.request.user.profile.store
+        
+        # 매장 기준으로 상품 필터링
+        return Product.get_store_products(store=store)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = '상품 목록'
+        return context
+
+class ProductCreateView(LoginRequiredMixin, CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'main/product_form.html'
+    success_url = reverse_lazy('product_list')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = '상품 추가'
+        return context
+    
+    def form_valid(self, form):
+        # 사용자의 매장 정보 자동 설정
+        if hasattr(self.request.user, 'profile') and self.request.user.profile.store:
+            form.instance.store = self.request.user.profile.store
+        return super().form_valid(form)
+
+class ProductDetailView(LoginRequiredMixin, DetailView):
+    model = Product
+    template_name = 'main/product_detail.html'
+    context_object_name = 'product'
+    
+    def get_queryset(self):
+        # 사용자 매장 기준으로 필터링
+        store = None
+        if hasattr(self.request.user, 'profile'):
+            store = self.request.user.profile.store
+        return Product.get_store_products(store=store)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = '상품 상세'
+        return context
+
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'main/product_form.html'
+    success_url = reverse_lazy('product_list')
+    
+    def get_queryset(self):
+        # 사용자 매장 기준으로 필터링
+        store = None
+        if hasattr(self.request.user, 'profile'):
+            store = self.request.user.profile.store
+        return Product.get_store_products(store=store)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = '상품 수정'
+        return context
