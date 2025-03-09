@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load i18n %}
 {% block content %}
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>작업 목록</h2>
+        <h2>{% trans '작업 목록' %}</h2>
         <a href="{% url 'create_work_item' %}" class="btn btn-primary">
-            <i class="bi bi-file-earmark-plus"></i> 작업 추가
+            <i class="bi bi-file-earmark-plus"></i> {% trans '작업 추가' %}
         </a>
     </div>
 
@@ -14,17 +15,17 @@
         <div class="card-body">
             <form method="GET" class="row g-3">
                 <div class="col-md-3">
-                    <label for="start_date" class="form-label">시작일자</label>
+                    <label for="start_date" class="form-label">{% trans '시작일자' %}</label>
                     <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request.GET.start_date }}">
                 </div>
                 <div class="col-md-3">
-                    <label for="end_date" class="form-label">종료일자</label>
+                    <label for="end_date" class="form-label">{% trans '종료일자' %}</label>
                     <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request.GET.end_date }}">
                 </div>
                 <div class="col-md-4">
-                    <label for="payment_method" class="form-label">결제수단</label>
+                    <label for="payment_method" class="form-label">{% trans '결제수단' %}</label>
                     <select name="payment_method" id="payment_method" class="form-select">
-                        <option value="">모두</option>
+                        <option value="">{% trans '모두' %}</option>
                         {% for value, label in payment_choices %}
                         <option value="{{ value }}" {% if request.GET.payment_method == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
@@ -32,10 +33,10 @@
                 </div>
                 <div class="col-12">
                     <button type="submit" class="btn btn-sm btn-warning">
-                        <i class="bi bi-funnel"></i> 필터 적용
+                        <i class="bi bi-funnel"></i> {% trans '필터 적용' %}
                     </button>
                     <a href="{% url 'work_item_list' %}" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-x-square"></i> 초기화
+                        <i class="bi bi-x-square"></i> {% trans '초기화' %}
                     </a>
                 </div>
             </form>
@@ -48,14 +49,14 @@
         <table class="table table-hover">
             <thead class="table-light">
                 <tr>
-                    <th>일시</th>
-                    <th>작업명</th>
-                    <th>재료비(원)</th>
-                    <th>공임(원)</th>
-                    <th>총액(원)</th>
-                    <th>결제수단</th>
-                    <th>작업자</th>
-                    <th>상세보기</th>
+                    <th>{% trans '일시' %}</th>
+                    <th>{% trans '작업명' %}</th>
+                    <th>{% trans '재료비(원)' %}</th>
+                    <th>{% trans '공임(원)' %}</th>
+                    <th>{% trans '총액(원)' %}</th>
+                    <th>{% trans '결제수단' %}</th>
+                    <th>{% trans '작업자' %}</th>
+                    <th>{% trans '상세보기' %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -69,7 +70,7 @@
                     <td align="center">{{ item.get_payment_method_display }}</td>
                     <td>{{ item.user.last_name }}{{ item.user.first_name }}</td>
                     <td>
-                        <a href="{% url 'work_detail' item.id %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-ruled"></i> 상세보기</a>
+                        <a href="{% url 'work_detail' item.id %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-ruled"></i> {% trans '상세보기' %}</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -82,44 +83,44 @@
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page=1{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">처음</a>
+                <a class="page-link" href="?page=1{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{% trans '처음' %}</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">이전</a>
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{% trans '이전' %}</a>
             </li>
             {% else %}
             <li class="page-item disabled">
-                <a class="page-link" href="#">처음</a>
+                <a class="page-link" href="#">{% trans '처음' %}</a>
             </li>
             <li class="page-item disabled">
-                <a class="page-link" href="#">이전</a>
+                <a class="page-link" href="#">{% trans '이전' %}</a>
             </li>
             {% endif %}
             
             <li class="page-item active">
-                <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+                <span class="page-link">{% blocktrans with number=page_obj.number total=page_obj.paginator.num_pages %}{{ number }} / {{ total }}{% endblocktrans %}</span>
             </li>
             
             {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">다음</a>
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{% trans '다음' %}</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">마지막</a>
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{% trans '마지막' %}</a>
             </li>
             {% else %}
             <li class="page-item disabled">
-                <a class="page-link" href="#">다음</a>
+                <a class="page-link" href="#">{% trans '다음' %}</a>
             </li>
             <li class="page-item disabled">
-                <a class="page-link" href="#">마지막</a>
+                <a class="page-link" href="#">{% trans '마지막' %}</a>
             </li>
             {% endif %}
         </ul>
     </nav>
     {% else %}
     <div class="alert alert-info" role="alert">
-        등록된 작업이 없습니다. 새 작업을 추가해보세요.
+        {% trans '등록된 작업이 없습니다. 새 작업을 추가해보세요.' %}
     </div>
     {% endif %}
 </div>

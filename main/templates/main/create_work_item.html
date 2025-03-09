@@ -1,27 +1,28 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">작업 내용 입력</h2>
+    <h2 class="mb-4">{% trans '작업 내용 입력' %}</h2>
 
     <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
 
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5>재료 정보</h5>
+                <h5>{% trans '재료 정보' %}</h5>
                 <button type="button" id="add-material" class="btn btn-sm btn-primary">
-                    + 재료 추가
+                    {% trans '+ 재료 추가' %}
                 </button>
             </div>
             <div class="card-body">
                 <div class="mb-3">
                     <div class="input-group">
-                        <span class="input-group-text">바코드 스캔</span>
-                        <input type="text" class="form-control" id="barcode-input" placeholder="바코드를 스캔하거나 입력하세요" autocomplete="off" autofocus>
-                        <button class="btn btn-outline-secondary" type="button" id="barcode-search">검색</button>
+                        <span class="input-group-text">{% trans '바코드 스캔' %}</span>
+                        <input type="text" class="form-control" id="barcode-input" placeholder="{% trans '바코드를 스캔하거나 입력하세요' %}" autocomplete="off" autofocus>
+                        <button class="btn btn-outline-secondary" type="button" id="barcode-search">{% trans '검색' %}</button>
                     </div>
-                    <small class="form-text text-muted">바코드를 스캔하면 재료가 자동으로 추가됩니다.</small>
+                    <small class="form-text text-muted">{% trans '바코드를 스캔하면 재료가 자동으로 추가됩니다.' %}</small>
                 </div>
 
                 <script>
@@ -53,19 +54,19 @@
                         
                         // 바코드로 제품 검색
                         function searchProductByBarcode(barcode) {
-                            console.log('바코드 검색:', barcode);
+                            console.log('{% trans "바코드 검색" %}:', barcode);
                             fetch(`/search-product-by-barcode/${barcode}/`)
                                 .then(response => response.json())
                                 .then(data => {
                                     if (data.success && data.product) {
                                         addMaterialWithProduct(data.product);
                                     } else {
-                                        alert('바코드와 일치하는 제품을 찾을 수 없습니다.');
+                                        alert('{% trans "바코드와 일치하는 제품을 찾을 수 없습니다." %}');
                                     }
                                 })
                                 .catch(error => {
-                                    console.error('바코드 검색 오류:', error);
-                                    alert('제품 검색 중 오류가 발생했습니다.');
+                                    console.error('{% trans "바코드 검색 오류" %}:', error);
+                                    alert('{% trans "제품 검색 중 오류가 발생했습니다." %}');
                                 });
                         }
                         
@@ -165,11 +166,11 @@
                 <table class="table table-bordered" id="material-table">
                     <thead>
                         <tr>
-                            <th style="width: 35%">재료명</th>
-                            <th style="width: 15%">수량</th>
-                            <th style="width: 20%">단가</th>
-                            <th style="width: 20%">합계</th>
-                            <th style="width: 10%">삭제</th>
+                            <th style="width: 35%">{% trans '재료명' %}</th>
+                            <th style="width: 15%">{% trans '수량' %}</th>
+                            <th style="width: 20%">{% trans '단가' %}</th>
+                            <th style="width: 20%">{% trans '합계' %}</th>
+                            <th style="width: 10%">{% trans '삭제' %}</th>
                         </tr>
                     </thead>
                     <tbody id="material-tbody">
@@ -198,7 +199,7 @@
                                 <div class="form-control total-price" readonly>0</div>
                             </td>
                             <td class="text-center">
-                                <button type="button" class="btn btn-sm btn-danger delete-material"><i class="bi bi-trash"></i> 삭제</button>
+                                <button type="button" class="btn btn-sm btn-danger delete-material"><i class="bi bi-trash"></i> {% trans '삭제' %}</button>
                                 <div style="display: none;">
                                     {{ form.DELETE }}
                                 </div>
@@ -212,7 +213,7 @@
 
         <div class="card mb-4">
             <div class="card-header">
-                <h5>작업 정보</h5>
+                <h5>{% trans '작업 정보' %}</h5>
             </div>
             <div class="card-body">
                 {% for field in work_form %}
@@ -238,18 +239,18 @@
         
         <div class="card mb-4">
             <div class="card-header">
-                <h5>결제 금액 정보</h5>
+                <h5>{% trans '결제 금액 정보' %}</h5>
             </div>
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-sm-2">
-                        <label class="col-form-label">재료비</label>
+                        <label class="col-form-label">{% trans '재료비' %}</label>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-control" id="total-material-display" readonly>0</div>
                     </div>
                     <div class="col-sm-2">
-                        <label class="col-form-label">공임</label>
+                        <label class="col-form-label">{% trans '공임' %}</label>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-control" id="labor-cost-display" readonly>0</div>
@@ -257,18 +258,18 @@
                 </div>
                 <div class="row mt-3">
                     <div class="col-sm-2">
-                        <label class="col-form-label fw-bold">총 결제 금액</label>
+                        <label class="col-form-label fw-bold">{% trans '총 결제 금액' %}</label>
                     </div>
                     <div class="col-sm-10">
-                        <h4 class="mb-0" id="grand-total-display">0원</h4>
+                        <h4 class="mb-0" id="grand-total-display">0{% trans '원' %}</h4>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="mt-4">
-            <button type="submit" class="btn btn-success"><i class="bi bi-floppy"></i> 저장하기</button>
-            <a href="{% url 'work_item_list' %}" class="btn btn-secondary">취소</a>
+            <button type="submit" class="btn btn-success"><i class="bi bi-floppy"></i> {% trans '저장하기' %}</button>
+            <a href="{% url 'work_item_list' %}" class="btn btn-secondary">{% trans '취소' %}</a>
         </div>
     </form>
 </div>
@@ -464,7 +465,7 @@
                     calculateRowTotal(formRow); // 단가 업데이트 후 합계 재계산
                 }
             })
-            .catch(error => console.error('제품 가격을 가져오는 중 오류 발생:', error));
+            .catch(error => console.error('{% trans "제품 가격을 가져오는 중 오류 발생" %}:', error));
     }
     
     // 한 행의 합계 계산
@@ -541,7 +542,7 @@
         const grandTotal = materialCost + laborCost;
         const grandTotalDisplay = document.querySelector('#grand-total-display');
         if (grandTotalDisplay) {
-            grandTotalDisplay.textContent = grandTotal.toLocaleString('ko-KR') + '원';
+            grandTotalDisplay.textContent = grandTotal.toLocaleString('ko-KR') + '{% trans "원" %}';
         }
     }
 </script>

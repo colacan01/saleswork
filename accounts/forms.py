@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.utils.translation import gettext_lazy as _
 from .models import UserProfile, Store
 
 class UserRegisterForm(UserCreationForm):
@@ -48,11 +49,11 @@ class ProfileUpdateForm(forms.ModelForm):
         
         fields = ['profile_image', 'phone_number', 'address', 'birth_date', 'bio']
         labels = {
-            'profile_image': '프로필 이미지',
-            'phone_number': '전화번호',
-            'address': '주소',
-            'birth_date': '생일',
-            'bio': '기타 정보'
+            'profile_image': _('프로필 이미지'),
+            'phone_number': _('전화번호'),
+            'address': _('주소'),
+            'birth_date': _('생일'),
+            'bio': _('기타 정보')
         }
         
         widgets = {
@@ -83,11 +84,11 @@ class StoreForm(forms.ModelForm):
         model = Store
         fields = ['name', 'business_number', 'phone_number', 'address', 'website']
         labels = {
-            'name': '매장명',
-            'business_number': '사업자번호',
-            'phone_number': '전화번호',
-            'address': '주소',
-            'website': '웹사이트'
+            'name': _('매장명'),
+            'business_number': _('사업자번호'),
+            'phone_number': _('전화번호'),
+            'address': _('주소'),
+            'website': _('웹사이트')
         }
 
     def __init__(self, *args, **kwargs):

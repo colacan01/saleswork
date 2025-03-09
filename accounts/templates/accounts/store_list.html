@@ -2,36 +2,36 @@
 {% load i18n %}
 {% block content %}
 <div class="container py-5">
-    <h2 class="mb-4">매장 관리</h2>
+    <h2 class="mb-4">{% trans "매장 관리" %}</h2>
     
     <!-- 검색 폼 -->
     <div class="card mb-4">
         <div class="card-header bg-secondary text-white">
-            매장 검색
+            {% trans "매장 검색" %}
         </div>
         <div class="card-body">
             <form method="get" action="{% url 'accounts:store_list' %}">
                 <div class="row">
                     <div class="col-md-5">
                         <div class="form-group">
-                            <label for="name">매장명</label>
+                            <label for="name">{% trans "매장명" %}</label>
                             <input type="text" class="form-control" id="name" name="name" value="{{ search_name }}">
                         </div>
                     </div>
                     <div class="col-md-5">
                         <div class="form-group">
-                            <label for="business_id">사업자번호</label>
+                            <label for="business_id">{% trans "사업자번호" %}</label>
                             <input type="text" class="form-control" id="business_id" name="business_id" value="{{ search_business_id }}">
                         </div>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> 검색</button>
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> {% trans "검색" %}</button>
                     </div>
                 </div>                
             </form>
             <div class="row mt-3">
                 <div class="col-12">
-                    <button type="button" class="btn btn-outline-secondary" id="toggle-form-btn"><i class="bi bi-database-add"></i> 매장 입력 폼 표시</button>
+                    <button type="button" class="btn btn-outline-secondary" id="toggle-form-btn"><i class="bi bi-database-add"></i> {% trans "매장 입력 폼 표시" %}</button>
                 </div>
             </div>
 
@@ -46,10 +46,10 @@
                     toggleBtn.addEventListener('click', function() {
                         if (formSection.style.display === 'none') {
                             formSection.style.display = 'block';
-                            toggleBtn.textContent = '매장 입력 폼 숨기기';
+                            toggleBtn.innerHTML = '<i class="bi bi-database-add"></i> ' + '{% trans "매장 입력 폼 숨기기" %}';
                         } else {
                             formSection.style.display = 'none';
-                            toggleBtn.textContent = '매장 입력 폼 표시';
+                            toggleBtn.innerHTML = '<i class="bi bi-database-add"></i> ' + '{% trans "매장 입력 폼 표시" %}';
                         }
                     });
                 });
@@ -60,15 +60,15 @@
     <!-- 매장 생성/수정 폼 -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            매장 정보 입력
+            {% trans "매장 정보 입력" %}
         </div>
         <div class="card-body">
             <form method="post" action="{% url 'accounts:store_list' %}" id="store-form">
                 {% csrf_token %}
                 <input type="hidden" name="store_id" id="store_id" value="">
                 {{ form }}
-                <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-floppy"></i> 저장하기</button>
-                <button type="button" id="reset-form" class="btn btn-secondary mt-3 ms-2"><i class="bi bi-x-circle"></i> 입력 초기화</button>
+                <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-floppy"></i> {% trans "저장하기" %}</button>
+                <button type="button" id="reset-form" class="btn btn-secondary mt-3 ms-2"><i class="bi bi-x-circle"></i> {% trans "입력 초기화" %}</button>
             </form>
         </div>
     </div>
@@ -76,16 +76,16 @@
     <!-- 매장 목록 -->
     <div class="card">
         <div class="card-header bg-info text-white">
-            매장 목록
+            {% trans "매장 목록" %}
         </div>
         <div class="card-body p-0">
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>매장명</th>
-                        <th>사업자번호</th>
-                        <th>주소</th>
-                        <th>작업</th>
+                        <th>{% trans "매장명" %}</th>
+                        <th>{% trans "사업자번호" %}</th>
+                        <th>{% trans "주소" %}</th>
+                        <th>{% trans "작업" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,17 +103,17 @@
                                         data-address="{{ store.address }}"
                                         data-phone-number="{{ store.phone_number }}"
                                         data-website="{{ store.website }}">
-                                    <i class="bi bi-pencil"></i> 수정
+                                    <i class="bi bi-pencil"></i> {% trans "수정" %}
                                 </button>
                                 <a href="#" class="btn btn-sm btn-danger delete-btn" data-id="{{ store.id }}" data-name="{{ store.name }}">
-                                    <i class="bi bi-trash"></i> 삭제
+                                    <i class="bi bi-trash"></i> {% trans "삭제" %}
                                 </a>
                             </td>
                         </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="4" class="text-center py-3">등록된 매장이 없습니다</td>
+                            <td colspan="4" class="text-center py-3">{% trans "등록된 매장이 없습니다" %}</td>
                         </tr>
                     {% endif %}
                 </tbody>
@@ -128,7 +128,7 @@
         {% for message in messages %}
             <div id="toast-{{ forloop.counter }}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header {% if message.tags %}{% if message.tags == 'error' %}bg-danger{% else %}bg-{{ message.tags }}{% endif %} text-white{% endif %}">
-                    <strong class="me-auto">알림</strong>
+                    <strong class="me-auto">{% trans "알림" %}</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
@@ -158,7 +158,7 @@
                 
                 // 토글 버튼 텍스트 변경
                 const toggleBtn = document.getElementById('toggle-form-btn');
-                toggleBtn.innerHTML = '<i class="bi bi-database-add"></i> 매장 입력 폼 숨기기';
+                toggleBtn.innerHTML = '<i class="bi bi-database-add"></i> {% trans "매장 입력 폼 숨기기" %}';
                 
                 // 폼 필드에 데이터 채우기
                 document.getElementById('store_id').value = id;
@@ -169,7 +169,7 @@
                 document.getElementById('id_website').value = website || '';
                 
                 // 폼 제출 버튼 텍스트 변경
-                document.querySelector('button[type="submit"]').innerHTML = '<i class="bi bi-pencil"></i> 수정하기';
+                document.querySelector('button[type="submit"]').innerHTML = '<i class="bi bi-pencil"></i> {% trans "수정하기" %}';
                 
                 // 폼으로 스크롤
                 formSection.scrollIntoView({ behavior: 'smooth' });
@@ -180,7 +180,7 @@
         document.getElementById('reset-form').addEventListener('click', function() {
             document.getElementById('store_id').value = '';
             document.getElementById('store-form').reset();
-            document.querySelector('button[type="submit"]').innerHTML = '<i class="bi bi-floppy"></i> 저장하기';
+            document.querySelector('button[type="submit"]').innerHTML = '<i class="bi bi-floppy"></i> {% trans "저장하기" %}';
         });
         
         // 삭제 버튼 클릭 시 처리
@@ -190,7 +190,7 @@
                 const storeId = this.getAttribute('data-id');
                 const storeName = this.getAttribute('data-name');
                 
-                if (confirm(`정말로 "${storeName}" 매장을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+                if (confirm('{% trans "정말로" %} "' + storeName + '" {% trans "매장을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다." %}')) {
                     window.location.href = `{% url 'accounts:store_list' %}delete/${storeId}/`;
                 }
             });
