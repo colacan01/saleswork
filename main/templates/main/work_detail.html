@@ -4,9 +4,9 @@
 {% block title %}{% trans "작업 상세 내역" %}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <div  id="workDetail">
-    <h1 class="mb-4">{% trans "작업 상세 내역" %}</h1>
+<div class="container mt-4">
+  <div id="workDetail">
+    <h2 class="mb-4">{% trans "작업 상세 내역" %}</h2>
     
     <div class="card mb-4">
       <div class="card-header">
@@ -36,8 +36,8 @@
     </div>
     
     <h3 class="mb-3">{% trans "사용 재료 목록" %}</h3>
-    <table class="table table-striped">
-      <thead>
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
         <tr>
           <th class="text-center">{% trans "재료명" %}</th>
           <th class="text-center">{% trans "수량" %}</th>
