@@ -41,6 +41,7 @@ def create_work_item(request):
             # 작업 내용 저장
             work_item = work_form.save(commit=False)
             work_item.user = request.user  # 현재 로그인한 사용자를 작업자로 설정
+            work_item.work_class = 'WORK'  # 작업 구분은 '작업'
             
             # 사용자 프로필에서 store 정보를 가져와 저장
             user_profile = request.user.profile
@@ -91,6 +92,8 @@ def work_item_list(request):
     if end_date:
         filter_params['date_time__lte'] = f"{end_date} 23:59:59"
     
+    filter_params['work_class'] = 'WORK'
+    
     # 작업 항목 조회 (최신순)
     work_items = WorkItem.objects.filter(**filter_params).order_by('-date_time')
     
@@ -120,7 +123,16 @@ def search_product_by_barcode(request, barcode):
     # Debug: Print barcode to console
     print(f"Searching for product with barcode: {barcode}")
     try:
-        product = Product.objects.get(barcode=barcode)
+        # Get the store from the user's profile
+        store = None
+        if hasattr(request.user, 'profile') and hasattr(request.user.profile, 'store'):
+            store = request.user.profile.store
+        
+        # Filter product by barcode and store if available
+        if store:
+            product = Product.objects.get(barcode=barcode, store=store)
+        else:
+            product = Product.objects.get(barcode=barcode)
         print(f"Found product: {product}")
         return JsonResponse({
             'success': True,
