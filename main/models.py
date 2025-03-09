@@ -84,6 +84,13 @@ class WorkItem(models.Model):
         ('LOCAL', _('지역화폐')),
     ]
     
+    WORK_CHOICES = [
+        ('WORK', _('작업')),
+        ('SALE', _('판매')),
+        ('ONLINE', _('온라인')),
+        ('KIOSK', _('키오스크')),
+    ]
+    
     date_time = models.DateTimeField(verbose_name=_('일시'))
     customer_phone = models.CharField(verbose_name=_('고객전화번호'), max_length=20, blank=True, null=True)
     work_name = models.CharField(verbose_name=_('작업명'), max_length=200)
@@ -98,6 +105,12 @@ class WorkItem(models.Model):
     notes = models.TextField(verbose_name=_('비고'), blank=True, null=True)
     user = models.ForeignKey(User, verbose_name=_('작업자'), on_delete=models.CASCADE)
     store = models.ForeignKey(Store, verbose_name=_('매장'), on_delete=models.CASCADE, blank=True, null=True)
+    work_class = models.CharField(
+        verbose_name=_('작업구분'),
+        max_length=10,
+        choices=WORK_CHOICES,
+        default='WORK'
+    )    
     
     def __str__(self):
         return f"{self.work_name} ({self.date_time.strftime('%Y-%m-%d')})"
