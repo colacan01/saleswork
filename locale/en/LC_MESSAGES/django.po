@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-09 09:31+0900\n"
+"POT-Creation-Date: 2025-03-09 16:45+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1242,7 +1242,7 @@ msgstr ""
 msgid "Connect, get help, or contribute"
 msgstr ""
 
-#: .\accounts\forms.py:52 .\templates\base.html:51
+#: .\accounts\forms.py:52 .\templates\base.html:60
 msgid "프로필 이미지"
 msgstr "Profile image"
 
@@ -1279,8 +1279,9 @@ msgstr "Business registration number"
 msgid "웹사이트"
 msgstr "Website"
 
-#: .\accounts\models.py:16 .\accounts\models.py:49 .\main\models.py:30
-#: .\main\models.py:47 .\main\models.py:59
+#: .\accounts\models.py:16 .\accounts\models.py:49 .\main\models.py:17
+#: .\main\models.py:48 .\main\models.py:100 .\main\models.py:118
+#: .\main\models.py:130
 msgid "매장"
 msgstr "store"
 
@@ -1299,7 +1300,7 @@ msgstr "Store list"
 
 #: .\accounts\templates\accounts\login.html:8
 #: .\accounts\templates\accounts\login.html:20
-#: .\accounts\templates\accounts\register.html:17 .\templates\base.html:66
+#: .\accounts\templates\accounts\register.html:17 .\templates\base.html:75
 msgid "로그인"
 msgstr "Login"
 
@@ -1316,7 +1317,7 @@ msgid "계정이 없으신가요?"
 msgstr "Don't have an account?"
 
 #: .\accounts\templates\accounts\login.html:23
-#: .\accounts\templates\accounts\register.html:9 .\templates\base.html:69
+#: .\accounts\templates\accounts\register.html:9 .\templates\base.html:78
 msgid "회원가입"
 msgstr "Register"
 
@@ -1336,6 +1337,7 @@ msgstr "Profile information"
 #: .\accounts\templates\accounts\store_list.html:70
 #: .\accounts\templates\accounts\store_list.html:183
 #: .\main\templates\main\create_work_item.html:271
+#: .\sales\templates\sales\create_sales_item.html:271
 msgid "저장하기"
 msgstr "Save"
 
@@ -1360,7 +1362,7 @@ msgstr "Sign up"
 msgid "이미 계정이 있으신가요?"
 msgstr "Already have an account?"
 
-#: .\accounts\templates\accounts\store_list.html:5 .\templates\base.html:22
+#: .\accounts\templates\accounts\store_list.html:5 .\templates\base.html:25
 msgid "매장 관리"
 msgstr "Store management"
 
@@ -1370,6 +1372,7 @@ msgstr "Store search"
 
 #: .\accounts\templates\accounts\store_list.html:28
 #: .\main\templates\main\create_work_item.html:23
+#: .\sales\templates\sales\create_sales_item.html:23
 msgid "검색"
 msgstr "Search"
 
@@ -1402,6 +1405,8 @@ msgstr "Edit"
 #: .\accounts\templates\accounts\store_list.html:109
 #: .\main\templates\main\create_work_item.html:173
 #: .\main\templates\main\create_work_item.html:202
+#: .\sales\templates\sales\create_sales_item.html:173
+#: .\sales\templates\sales\create_sales_item.html:202
 msgid "삭제"
 msgstr "Delete"
 
@@ -1448,92 +1453,105 @@ msgstr "Delete successfully \"{store_name}\" information"
 msgid "삭제할 매장을 찾을 수 없습니다."
 msgstr "Unable to Find \"{store_name}\" information to Delete"
 
-#: .\main\models.py:12
+#: .\main\models.py:82
 msgid "현금"
 msgstr "cash"
 
-#: .\main\models.py:13
+#: .\main\models.py:83
 msgid "카드"
 msgstr "card"
 
-#: .\main\models.py:14
+#: .\main\models.py:84
 msgid "지역화폐"
 msgstr "local currency"
 
-#: .\main\models.py:17 .\main\templates\main\work_detail.html:18
+#: .\main\models.py:87 .\main\templates\main\work_detail.html:18
 #: .\main\templates\main\work_item_list.html:52
+#: .\sales\templates\sales\sales_detail.html:18
+#: .\sales\templates\sales\sales_item_list.html:52
 msgid "일시"
 msgstr "date and time"
 
-#: .\main\models.py:18
+#: .\main\models.py:88
 msgid "고객전화번호"
 msgstr "customer phone number"
 
-#: .\main\models.py:19 .\main\templates\main\work_item_list.html:53
+#: .\main\models.py:89 .\main\templates\main\work_item_list.html:53
 msgid "작업명"
 msgstr "task name"
 
-#: .\main\models.py:20 .\main\templates\main\create_work_item.html:247
+#: .\main\models.py:90 .\main\templates\main\create_work_item.html:247
 #: .\main\templates\main\work_detail.html:23
+#: .\sales\templates\sales\sales_detail.html:23
 msgid "재료비"
 msgstr "material cost"
 
-#: .\main\models.py:21 .\main\templates\main\create_work_item.html:253
+#: .\main\models.py:91 .\main\templates\main\create_work_item.html:253
 #: .\main\templates\main\work_detail.html:24
+#: .\sales\templates\sales\create_sales_item.html:253
 msgid "공임"
 msgstr "labor cost"
 
-#: .\main\models.py:23 .\main\templates\main\work_detail.html:20
+#: .\main\models.py:93 .\main\templates\main\work_detail.html:20
 #: .\main\templates\main\work_item_list.html:26
 #: .\main\templates\main\work_item_list.html:57
+#: .\sales\templates\sales\sales_detail.html:20
+#: .\sales\templates\sales\sales_item_list.html:26
+#: .\sales\templates\sales\sales_item_list.html:58
 msgid "결제수단"
 msgstr "payment method"
 
-#: .\main\models.py:28 .\main\templates\main\work_detail.html:31
+#: .\main\models.py:98 .\main\templates\main\work_detail.html:31
+#: .\sales\templates\sales\sales_detail.html:30
 msgid "비고"
 msgstr "remarks"
 
-#: .\main\models.py:29 .\main\templates\main\work_detail.html:19
+#: .\main\models.py:99 .\main\templates\main\work_detail.html:19
 #: .\main\templates\main\work_item_list.html:58
 msgid "작업자"
 msgstr "worker"
 
-#: .\main\models.py:42
+#: .\main\models.py:113 .\sales\templates\sales\create_sales_item.html:169
+#: .\sales\templates\sales\sales_detail.html:41
 msgid "상품명"
 msgstr "product name"
 
-#: .\main\models.py:43
+#: .\main\models.py:114
 msgid "판매금액"
 msgstr "sales amount"
 
-#: .\main\models.py:44
+#: .\main\models.py:115
 msgid "단위가격"
 msgstr "unit price"
 
-#: .\main\models.py:45
+#: .\main\models.py:116
 msgid "상품 이미지"
 msgstr "product image"
 
-#: .\main\models.py:46
+#: .\main\models.py:117
 msgid "재고 수량"
 msgstr "stock quantity"
 
-#: .\main\models.py:48
+#: .\main\models.py:119
 msgid "바코드"
 msgstr "barcode"
 
-#: .\main\models.py:56 .\main\templates\main\create_work_item.html:169
+#: .\main\models.py:127 .\main\templates\main\create_work_item.html:169
 #: .\main\templates\main\work_detail.html:42
 msgid "재료명"
 msgstr "material name"
 
-#: .\main\models.py:57 .\main\templates\main\create_work_item.html:170
+#: .\main\models.py:128 .\main\templates\main\create_work_item.html:170
 #: .\main\templates\main\work_detail.html:43
+#: .\sales\templates\sales\create_sales_item.html:170
+#: .\sales\templates\sales\sales_detail.html:42
 msgid "수량"
 msgstr "quantity"
 
-#: .\main\models.py:58 .\main\templates\main\create_work_item.html:171
+#: .\main\models.py:129 .\main\templates\main\create_work_item.html:171
 #: .\main\templates\main\work_detail.html:44
+#: .\sales\templates\sales\create_sales_item.html:171
+#: .\sales\templates\sales\sales_detail.html:43
 msgid "단가"
 msgstr "unit cost"
 
@@ -1550,10 +1568,12 @@ msgid "+ 재료 추가"
 msgstr "+ Add material"
 
 #: .\main\templates\main\create_work_item.html:21
+#: .\sales\templates\sales\create_sales_item.html:21
 msgid "바코드 스캔"
 msgstr "Scan barcode"
 
 #: .\main\templates\main\create_work_item.html:22
+#: .\sales\templates\sales\create_sales_item.html:22
 msgid "바코드를 스캔하거나 입력하세요"
 msgstr "Scan or enter the barcode"
 
@@ -1562,22 +1582,27 @@ msgid "바코드를 스캔하면 재료가 자동으로 추가됩니다."
 msgstr "Materials will be added automatically when barcode is scanned"
 
 #: .\main\templates\main\create_work_item.html:57
+#: .\sales\templates\sales\create_sales_item.html:57
 msgid "바코드 검색"
 msgstr "Barcode search"
 
 #: .\main\templates\main\create_work_item.html:64
+#: .\sales\templates\sales\create_sales_item.html:64
 msgid "바코드와 일치하는 제품을 찾을 수 없습니다."
 msgstr "No product matching the barcode was found"
 
 #: .\main\templates\main\create_work_item.html:68
+#: .\sales\templates\sales\create_sales_item.html:68
 msgid "바코드 검색 오류"
 msgstr "Barcode search error"
 
 #: .\main\templates\main\create_work_item.html:69
+#: .\sales\templates\sales\create_sales_item.html:69
 msgid "제품 검색 중 오류가 발생했습니다."
 msgstr "An error occurred while searching for the product"
 
 #: .\main\templates\main\create_work_item.html:172
+#: .\sales\templates\sales\create_sales_item.html:172
 msgid "합계"
 msgstr "Total"
 
@@ -1586,10 +1611,12 @@ msgid "작업 정보"
 msgstr "Work information"
 
 #: .\main\templates\main\create_work_item.html:242
+#: .\sales\templates\sales\create_sales_item.html:242
 msgid "결제 금액 정보"
 msgstr "Payment amount information"
 
 #: .\main\templates\main\create_work_item.html:261
+#: .\sales\templates\sales\create_sales_item.html:261
 msgid "총 결제 금액"
 msgstr "Total payment amount"
 
@@ -1600,14 +1627,22 @@ msgstr "Total payment amount"
 #: .\main\templates\main\work_detail.html:25
 #: .\main\templates\main\work_detail.html:53
 #: .\main\templates\main\work_detail.html:54
+#: .\sales\templates\sales\create_sales_item.html:264
+#: .\sales\templates\sales\create_sales_item.html:545
+#: .\sales\templates\sales\sales_detail.html:23
+#: .\sales\templates\sales\sales_detail.html:24
+#: .\sales\templates\sales\sales_detail.html:52
+#: .\sales\templates\sales\sales_detail.html:53
 msgid "원"
 msgstr "Won"
 
 #: .\main\templates\main\create_work_item.html:272
+#: .\sales\templates\sales\create_sales_item.html:272
 msgid "취소"
 msgstr "Cancel"
 
 #: .\main\templates\main\create_work_item.html:468
+#: .\sales\templates\sales\create_sales_item.html:468
 msgid "제품 가격을 가져오는 중 오류 발생"
 msgstr "Error occurred while retrieving product price"
 
@@ -1617,6 +1652,7 @@ msgid "작업 상세 내역"
 msgstr "Work Details"
 
 #: .\main\templates\main\work_detail.html:25
+#: .\sales\templates\sales\sales_detail.html:24
 msgid "총 금액"
 msgstr "Total Amount"
 
@@ -1625,6 +1661,7 @@ msgid "사용 재료 목록"
 msgstr "Used Materials List"
 
 #: .\main\templates\main\work_detail.html:45
+#: .\sales\templates\sales\sales_detail.html:44
 msgid "총 비용"
 msgstr "Total Cost"
 
@@ -1633,10 +1670,12 @@ msgid "등록된 재료가 없습니다."
 msgstr "No materials registered."
 
 #: .\main\templates\main\work_detail.html:66
+#: .\sales\templates\sales\sales_detail.html:65
 msgid "목록으로"
 msgstr "Back to List"
 
 #: .\main\templates\main\work_detail.html:69
+#: .\sales\templates\sales\sales_detail.html:68
 msgid "PDF 만들기"
 msgstr "Create PDF"
 
@@ -1644,7 +1683,7 @@ msgstr "Create PDF"
 msgid "작업상세내역"
 msgstr "Work Detail Information"
 
-#: .\main\templates\main\work_item_list.html:7 .\templates\base.html:32
+#: .\main\templates\main\work_item_list.html:7 .\templates\base.html:35
 msgid "작업 목록"
 msgstr "Work list"
 
@@ -1653,22 +1692,27 @@ msgid "작업 추가"
 msgstr "Add work"
 
 #: .\main\templates\main\work_item_list.html:18
+#: .\sales\templates\sales\sales_item_list.html:18
 msgid "시작일자"
 msgstr "Start date"
 
 #: .\main\templates\main\work_item_list.html:22
+#: .\sales\templates\sales\sales_item_list.html:22
 msgid "종료일자"
 msgstr "End date"
 
 #: .\main\templates\main\work_item_list.html:28
+#: .\sales\templates\sales\sales_item_list.html:28
 msgid "모두"
 msgstr "All"
 
 #: .\main\templates\main\work_item_list.html:36
+#: .\sales\templates\sales\sales_item_list.html:36
 msgid "필터 적용"
 msgstr "Apply filter"
 
 #: .\main\templates\main\work_item_list.html:39
+#: .\sales\templates\sales\sales_item_list.html:39
 msgid "초기화"
 msgstr "Reset"
 
@@ -1686,31 +1730,42 @@ msgstr "Total amount (Won)"
 
 #: .\main\templates\main\work_item_list.html:59
 #: .\main\templates\main\work_item_list.html:73
+#: .\sales\templates\sales\sales_item_list.html:60
+#: .\sales\templates\sales\sales_item_list.html:75
 msgid "상세보기"
 msgstr "View details"
 
 #: .\main\templates\main\work_item_list.html:86
 #: .\main\templates\main\work_item_list.html:93
+#: .\sales\templates\sales\sales_item_list.html:88
+#: .\sales\templates\sales\sales_item_list.html:95
 msgid "처음"
 msgstr "First"
 
 #: .\main\templates\main\work_item_list.html:89
 #: .\main\templates\main\work_item_list.html:96
+#: .\sales\templates\sales\sales_item_list.html:91
+#: .\sales\templates\sales\sales_item_list.html:98
 msgid "이전"
 msgstr "Previous"
 
 #: .\main\templates\main\work_item_list.html:101
+#: .\sales\templates\sales\sales_item_list.html:103
 #, python-format
 msgid "%(number)s / %(total)s"
 msgstr "%(number)s / %(total)s"
 
 #: .\main\templates\main\work_item_list.html:106
 #: .\main\templates\main\work_item_list.html:113
+#: .\sales\templates\sales\sales_item_list.html:108
+#: .\sales\templates\sales\sales_item_list.html:115
 msgid "다음"
 msgstr "Next"
 
 #: .\main\templates\main\work_item_list.html:109
 #: .\main\templates\main\work_item_list.html:116
+#: .\sales\templates\sales\sales_item_list.html:111
+#: .\sales\templates\sales\sales_item_list.html:118
 msgid "마지막"
 msgstr "Last"
 
@@ -1718,22 +1773,99 @@ msgstr "Last"
 msgid "등록된 작업이 없습니다. 새 작업을 추가해보세요."
 msgstr "No registered work. Try adding a new work."
 
+#: .\sales\templates\sales\create_sales_item.html:6
+#, fuzzy
+#| msgid "작업 내용 입력"
+msgid "판매 내용 입력"
+msgstr "Enter work details"
+
+#: .\sales\templates\sales\create_sales_item.html:13
+msgid "상품 정보"
+msgstr "Product information"
+
+#: .\sales\templates\sales\create_sales_item.html:15
+msgid "+ 상품 추가"
+msgstr "+ Add product"
+
+#: .\sales\templates\sales\create_sales_item.html:25
+#, fuzzy
+#| msgid "바코드를 스캔하면 재료가 자동으로 추가됩니다."
+msgid "바코드를 스캔하면 상품이 자동으로 추가됩니다."
+msgstr "Products will be added automatically when barcode is scanned"
+
+#: .\sales\templates\sales\create_sales_item.html:216
+msgid "판매 정보"
+msgstr "Sales information"
+
+#: .\sales\templates\sales\create_sales_item.html:247
+msgid "상품금액"
+msgstr "Product price"
+
+#: .\sales\templates\sales\sales_detail.html:4
+#: .\sales\templates\sales\sales_detail.html:9
+#, fuzzy
+#| msgid "작업 상세 내역"
+msgid "판매 상세 내역"
+msgstr "Sales Details"
+
+#: .\sales\templates\sales\sales_detail.html:19
+#: .\sales\templates\sales\sales_item_list.html:59
+msgid "판매자"
+msgstr "Seller"
+
+#: .\sales\templates\sales\sales_detail.html:37
+#: .\sales\templates\sales\sales_item_list.html:7
+msgid "판매 목록"
+msgstr "Sales list"
+
+#: .\sales\templates\sales\sales_detail.html:57
+#, fuzzy
+#| msgid "등록된 재료가 없습니다."
+msgid "등록된 판매목록가 없습니다."
+msgstr "No sales items registered."
+
+#: .\sales\templates\sales\sales_detail.html:77
+#, fuzzy
+#| msgid "작업상세내역"
+msgid "판매상세내역"
+msgstr "Sales Detail Information"
+
+#: .\sales\templates\sales\sales_item_list.html:9
+msgid "판매 추가"
+msgstr "Add sale"
+
+#: .\sales\templates\sales\sales_item_list.html:53
+msgid "판매명"
+msgstr "Sale name"
+
+#: .\sales\templates\sales\sales_item_list.html:54
+msgid "매출(원)"
+msgstr "Revenue (Won)"
+
+#: .\sales\templates\sales\sales_item_list.html:57
+msgid "합계(원)"
+msgstr "Total (Won)"
+
+#: .\sales\templates\sales\sales_item_list.html:125
+msgid "등록된 판매내역이 없습니다. 판매내역을 추가해보세요."
+msgstr "No sales records registered. Try adding a new sale."
+
 #: .\templates\base.html:8
 msgid "판매/작업 관리"
 msgstr "Sales/Work Management"
 
-#: .\templates\base.html:37
+#: .\templates\base.html:40
 msgid "[dev] 매장 판매"
 msgstr "[dev] Store Sales"
 
-#: .\templates\base.html:56
+#: .\templates\base.html:65
 msgid "프로필 수정"
 msgstr "Edit Profile"
 
-#: .\templates\base.html:58
+#: .\templates\base.html:67
 msgid "매장 정보 관리"
 msgstr "Store Information Management"
 
-#: .\templates\base.html:61
+#: .\templates\base.html:70
 msgid "로그아웃"
 msgstr "Logout"

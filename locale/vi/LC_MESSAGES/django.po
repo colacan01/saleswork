@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-09 09:31+0900\n"
+"POT-Creation-Date: 2025-03-09 16:45+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1242,7 +1242,7 @@ msgstr ""
 msgid "Connect, get help, or contribute"
 msgstr ""
 
-#: .\accounts\forms.py:52 .\templates\base.html:51
+#: .\accounts\forms.py:52 .\templates\base.html:60
 msgid "프로필 이미지"
 msgstr "Hình ảnh sản phẩm"
 
@@ -1279,8 +1279,9 @@ msgstr "Mã số doanh nghiệp"
 msgid "웹사이트"
 msgstr "Trang web"
 
-#: .\accounts\models.py:16 .\accounts\models.py:49 .\main\models.py:30
-#: .\main\models.py:47 .\main\models.py:59
+#: .\accounts\models.py:16 .\accounts\models.py:49 .\main\models.py:17
+#: .\main\models.py:48 .\main\models.py:100 .\main\models.py:118
+#: .\main\models.py:130
 msgid "매장"
 msgstr "Cửa hàng"
 
@@ -1299,7 +1300,7 @@ msgstr "Danh sách cửa hàng"
 
 #: .\accounts\templates\accounts\login.html:8
 #: .\accounts\templates\accounts\login.html:20
-#: .\accounts\templates\accounts\register.html:17 .\templates\base.html:66
+#: .\accounts\templates\accounts\register.html:17 .\templates\base.html:75
 msgid "로그인"
 msgstr "Đăng nhập"
 
@@ -1316,7 +1317,7 @@ msgid "계정이 없으신가요?"
 msgstr "Bạn chưa có tài khoản?"
 
 #: .\accounts\templates\accounts\login.html:23
-#: .\accounts\templates\accounts\register.html:9 .\templates\base.html:69
+#: .\accounts\templates\accounts\register.html:9 .\templates\base.html:78
 msgid "회원가입"
 msgstr "Đăng ký"
 
@@ -1336,6 +1337,7 @@ msgstr "Thông tin hồ sơ"
 #: .\accounts\templates\accounts\store_list.html:70
 #: .\accounts\templates\accounts\store_list.html:183
 #: .\main\templates\main\create_work_item.html:271
+#: .\sales\templates\sales\create_sales_item.html:271
 msgid "저장하기"
 msgstr "Lưu"
 
@@ -1360,7 +1362,7 @@ msgstr "Đăng ký"
 msgid "이미 계정이 있으신가요?"
 msgstr "Bạn đã có tài khoản chưa?"
 
-#: .\accounts\templates\accounts\store_list.html:5 .\templates\base.html:22
+#: .\accounts\templates\accounts\store_list.html:5 .\templates\base.html:25
 msgid "매장 관리"
 msgstr "Quản lý cửa hàng"
 
@@ -1370,6 +1372,7 @@ msgstr "Tìm kiếm cửa hàng"
 
 #: .\accounts\templates\accounts\store_list.html:28
 #: .\main\templates\main\create_work_item.html:23
+#: .\sales\templates\sales\create_sales_item.html:23
 msgid "검색"
 msgstr "Tìm kiếm"
 
@@ -1402,6 +1405,8 @@ msgstr "Sửa"
 #: .\accounts\templates\accounts\store_list.html:109
 #: .\main\templates\main\create_work_item.html:173
 #: .\main\templates\main\create_work_item.html:202
+#: .\sales\templates\sales\create_sales_item.html:173
+#: .\sales\templates\sales\create_sales_item.html:202
 msgid "삭제"
 msgstr "Xóa"
 
@@ -1448,92 +1453,105 @@ msgstr "Cửa hàng \"{store_name}\" đã được xóa thành công."
 msgid "삭제할 매장을 찾을 수 없습니다."
 msgstr "Không tìm thấy cửa hàng để xóa."
 
-#: .\main\models.py:12
+#: .\main\models.py:82
 msgid "현금"
 msgstr "Tiền mặt"
 
-#: .\main\models.py:13
+#: .\main\models.py:83
 msgid "카드"
 msgstr "Thẻ"
 
-#: .\main\models.py:14
+#: .\main\models.py:84
 msgid "지역화폐"
 msgstr "Tiền địa phương"
 
-#: .\main\models.py:17 .\main\templates\main\work_detail.html:18
+#: .\main\models.py:87 .\main\templates\main\work_detail.html:18
 #: .\main\templates\main\work_item_list.html:52
+#: .\sales\templates\sales\sales_detail.html:18
+#: .\sales\templates\sales\sales_item_list.html:52
 msgid "일시"
 msgstr "Thời gian"
 
-#: .\main\models.py:18
+#: .\main\models.py:88
 msgid "고객전화번호"
 msgstr "Số điện thoại khách hàng"
 
-#: .\main\models.py:19 .\main\templates\main\work_item_list.html:53
+#: .\main\models.py:89 .\main\templates\main\work_item_list.html:53
 msgid "작업명"
 msgstr "Tên công việc"
 
-#: .\main\models.py:20 .\main\templates\main\create_work_item.html:247
+#: .\main\models.py:90 .\main\templates\main\create_work_item.html:247
 #: .\main\templates\main\work_detail.html:23
+#: .\sales\templates\sales\sales_detail.html:23
 msgid "재료비"
 msgstr "Chi phí nguyên liệu"
 
-#: .\main\models.py:21 .\main\templates\main\create_work_item.html:253
+#: .\main\models.py:91 .\main\templates\main\create_work_item.html:253
 #: .\main\templates\main\work_detail.html:24
+#: .\sales\templates\sales\create_sales_item.html:253
 msgid "공임"
 msgstr "Công thợ"
 
-#: .\main\models.py:23 .\main\templates\main\work_detail.html:20
+#: .\main\models.py:93 .\main\templates\main\work_detail.html:20
 #: .\main\templates\main\work_item_list.html:26
 #: .\main\templates\main\work_item_list.html:57
+#: .\sales\templates\sales\sales_detail.html:20
+#: .\sales\templates\sales\sales_item_list.html:26
+#: .\sales\templates\sales\sales_item_list.html:58
 msgid "결제수단"
 msgstr "Phương thức thanh toán"
 
-#: .\main\models.py:28 .\main\templates\main\work_detail.html:31
+#: .\main\models.py:98 .\main\templates\main\work_detail.html:31
+#: .\sales\templates\sales\sales_detail.html:30
 msgid "비고"
 msgstr "Ghi chú"
 
-#: .\main\models.py:29 .\main\templates\main\work_detail.html:19
+#: .\main\models.py:99 .\main\templates\main\work_detail.html:19
 #: .\main\templates\main\work_item_list.html:58
 msgid "작업자"
 msgstr "Người thực hiện"
 
-#: .\main\models.py:42
+#: .\main\models.py:113 .\sales\templates\sales\create_sales_item.html:169
+#: .\sales\templates\sales\sales_detail.html:41
 msgid "상품명"
 msgstr "Tên sản phẩm"
 
-#: .\main\models.py:43
+#: .\main\models.py:114
 msgid "판매금액"
 msgstr "Giá bán"
 
-#: .\main\models.py:44
+#: .\main\models.py:115
 msgid "단위가격"
 msgstr "Đơn giá"
 
-#: .\main\models.py:45
+#: .\main\models.py:116
 msgid "상품 이미지"
 msgstr "Hình ảnh sản phẩm"
 
-#: .\main\models.py:46
+#: .\main\models.py:117
 msgid "재고 수량"
 msgstr "Số lượng tồn kho"
 
-#: .\main\models.py:48
+#: .\main\models.py:119
 msgid "바코드"
 msgstr "Mã vạch"
 
-#: .\main\models.py:56 .\main\templates\main\create_work_item.html:169
+#: .\main\models.py:127 .\main\templates\main\create_work_item.html:169
 #: .\main\templates\main\work_detail.html:42
 msgid "재료명"
 msgstr "Tên nguyên liệu"
 
-#: .\main\models.py:57 .\main\templates\main\create_work_item.html:170
+#: .\main\models.py:128 .\main\templates\main\create_work_item.html:170
 #: .\main\templates\main\work_detail.html:43
+#: .\sales\templates\sales\create_sales_item.html:170
+#: .\sales\templates\sales\sales_detail.html:42
 msgid "수량"
 msgstr "Số lượng"
 
-#: .\main\models.py:58 .\main\templates\main\create_work_item.html:171
+#: .\main\models.py:129 .\main\templates\main\create_work_item.html:171
 #: .\main\templates\main\work_detail.html:44
+#: .\sales\templates\sales\create_sales_item.html:171
+#: .\sales\templates\sales\sales_detail.html:43
 msgid "단가"
 msgstr "Đơn giá"
 
@@ -1550,10 +1568,12 @@ msgid "+ 재료 추가"
 msgstr "+ Thêm nguyên liệu"
 
 #: .\main\templates\main\create_work_item.html:21
+#: .\sales\templates\sales\create_sales_item.html:21
 msgid "바코드 스캔"
 msgstr "Quét mã vạch"
 
 #: .\main\templates\main\create_work_item.html:22
+#: .\sales\templates\sales\create_sales_item.html:22
 msgid "바코드를 스캔하거나 입력하세요"
 msgstr "Quét hoặc nhập mã vạch"
 
@@ -1562,22 +1582,27 @@ msgid "바코드를 스캔하면 재료가 자동으로 추가됩니다."
 msgstr "Nguyên liệu sẽ được tự động thêm khi quét mã vạch."
 
 #: .\main\templates\main\create_work_item.html:57
+#: .\sales\templates\sales\create_sales_item.html:57
 msgid "바코드 검색"
 msgstr "Tìm kiếm mã vạch"
 
 #: .\main\templates\main\create_work_item.html:64
+#: .\sales\templates\sales\create_sales_item.html:64
 msgid "바코드와 일치하는 제품을 찾을 수 없습니다."
 msgstr "Không tìm thấy sản phẩm khớp với mã vạch."
 
 #: .\main\templates\main\create_work_item.html:68
+#: .\sales\templates\sales\create_sales_item.html:68
 msgid "바코드 검색 오류"
 msgstr "Lỗi tìm kiếm mã vạch"
 
 #: .\main\templates\main\create_work_item.html:69
+#: .\sales\templates\sales\create_sales_item.html:69
 msgid "제품 검색 중 오류가 발생했습니다."
 msgstr "Đã xảy ra lỗi khi tìm kiếm sản phẩm."
 
 #: .\main\templates\main\create_work_item.html:172
+#: .\sales\templates\sales\create_sales_item.html:172
 msgid "합계"
 msgstr "Tổng cộng"
 
@@ -1586,10 +1611,12 @@ msgid "작업 정보"
 msgstr "Thông tin công việc"
 
 #: .\main\templates\main\create_work_item.html:242
+#: .\sales\templates\sales\create_sales_item.html:242
 msgid "결제 금액 정보"
 msgstr "Thông tin thanh toán"
 
 #: .\main\templates\main\create_work_item.html:261
+#: .\sales\templates\sales\create_sales_item.html:261
 msgid "총 결제 금액"
 msgstr "Tổng số tiền thanh toán"
 
@@ -1600,14 +1627,22 @@ msgstr "Tổng số tiền thanh toán"
 #: .\main\templates\main\work_detail.html:25
 #: .\main\templates\main\work_detail.html:53
 #: .\main\templates\main\work_detail.html:54
+#: .\sales\templates\sales\create_sales_item.html:264
+#: .\sales\templates\sales\create_sales_item.html:545
+#: .\sales\templates\sales\sales_detail.html:23
+#: .\sales\templates\sales\sales_detail.html:24
+#: .\sales\templates\sales\sales_detail.html:52
+#: .\sales\templates\sales\sales_detail.html:53
 msgid "원"
 msgstr "₫"
 
 #: .\main\templates\main\create_work_item.html:272
+#: .\sales\templates\sales\create_sales_item.html:272
 msgid "취소"
 msgstr "Hủy"
 
 #: .\main\templates\main\create_work_item.html:468
+#: .\sales\templates\sales\create_sales_item.html:468
 msgid "제품 가격을 가져오는 중 오류 발생"
 msgstr "Lỗi khi lấy giá sản phẩm"
 
@@ -1617,6 +1652,7 @@ msgid "작업 상세 내역"
 msgstr "Chi tiết công việc"
 
 #: .\main\templates\main\work_detail.html:25
+#: .\sales\templates\sales\sales_detail.html:24
 msgid "총 금액"
 msgstr "Tổng tiền"
 
@@ -1625,6 +1661,7 @@ msgid "사용 재료 목록"
 msgstr "Danh sách nguyên liệu đã sử dụng"
 
 #: .\main\templates\main\work_detail.html:45
+#: .\sales\templates\sales\sales_detail.html:44
 msgid "총 비용"
 msgstr "Tổng chi phí"
 
@@ -1633,10 +1670,12 @@ msgid "등록된 재료가 없습니다."
 msgstr "Không có nguyên liệu nào được đăng ký."
 
 #: .\main\templates\main\work_detail.html:66
+#: .\sales\templates\sales\sales_detail.html:65
 msgid "목록으로"
 msgstr "Quay lại danh sách"
 
 #: .\main\templates\main\work_detail.html:69
+#: .\sales\templates\sales\sales_detail.html:68
 msgid "PDF 만들기"
 msgstr "Tạo PDF"
 
@@ -1644,7 +1683,7 @@ msgstr "Tạo PDF"
 msgid "작업상세내역"
 msgstr "Chi tiết công việc"
 
-#: .\main\templates\main\work_item_list.html:7 .\templates\base.html:32
+#: .\main\templates\main\work_item_list.html:7 .\templates\base.html:35
 msgid "작업 목록"
 msgstr "Danh sách công việc"
 
@@ -1653,22 +1692,27 @@ msgid "작업 추가"
 msgstr "Thêm công việc"
 
 #: .\main\templates\main\work_item_list.html:18
+#: .\sales\templates\sales\sales_item_list.html:18
 msgid "시작일자"
 msgstr "Ngày bắt đầu"
 
 #: .\main\templates\main\work_item_list.html:22
+#: .\sales\templates\sales\sales_item_list.html:22
 msgid "종료일자"
 msgstr "Ngày kết thúc"
 
 #: .\main\templates\main\work_item_list.html:28
+#: .\sales\templates\sales\sales_item_list.html:28
 msgid "모두"
 msgstr "Tất cả"
 
 #: .\main\templates\main\work_item_list.html:36
+#: .\sales\templates\sales\sales_item_list.html:36
 msgid "필터 적용"
 msgstr "Áp dụng bộ lọc"
 
 #: .\main\templates\main\work_item_list.html:39
+#: .\sales\templates\sales\sales_item_list.html:39
 msgid "초기화"
 msgstr "Đặt lại"
 
@@ -1686,31 +1730,42 @@ msgstr "Tổng cộng (₫)"
 
 #: .\main\templates\main\work_item_list.html:59
 #: .\main\templates\main\work_item_list.html:73
+#: .\sales\templates\sales\sales_item_list.html:60
+#: .\sales\templates\sales\sales_item_list.html:75
 msgid "상세보기"
 msgstr "Xem chi tiết"
 
 #: .\main\templates\main\work_item_list.html:86
 #: .\main\templates\main\work_item_list.html:93
+#: .\sales\templates\sales\sales_item_list.html:88
+#: .\sales\templates\sales\sales_item_list.html:95
 msgid "처음"
 msgstr "Đầu tiên"
 
 #: .\main\templates\main\work_item_list.html:89
 #: .\main\templates\main\work_item_list.html:96
+#: .\sales\templates\sales\sales_item_list.html:91
+#: .\sales\templates\sales\sales_item_list.html:98
 msgid "이전"
 msgstr "Trước"
 
 #: .\main\templates\main\work_item_list.html:101
+#: .\sales\templates\sales\sales_item_list.html:103
 #, python-format
 msgid "%(number)s / %(total)s"
 msgstr "%(number)s / %(total)s"
 
 #: .\main\templates\main\work_item_list.html:106
 #: .\main\templates\main\work_item_list.html:113
+#: .\sales\templates\sales\sales_item_list.html:108
+#: .\sales\templates\sales\sales_item_list.html:115
 msgid "다음"
 msgstr "Tiếp theo"
 
 #: .\main\templates\main\work_item_list.html:109
 #: .\main\templates\main\work_item_list.html:116
+#: .\sales\templates\sales\sales_item_list.html:111
+#: .\sales\templates\sales\sales_item_list.html:118
 msgid "마지막"
 msgstr "Cuối cùng"
 
@@ -1718,22 +1773,89 @@ msgstr "Cuối cùng"
 msgid "등록된 작업이 없습니다. 새 작업을 추가해보세요."
 msgstr "Không có công việc nào được đăng ký. Hãy thử thêm một công việc mới."
 
+#: .\sales\templates\sales\create_sales_item.html:6
+msgid "판매 내용 입력"
+msgstr "Nhập nội dung bán hàng"
+
+#: .\sales\templates\sales\create_sales_item.html:13
+msgid "상품 정보"
+msgstr "Thông tin sản phẩm"
+
+#: .\sales\templates\sales\create_sales_item.html:15
+msgid "+ 상품 추가"
+msgstr "+ Thêm sản phẩm"
+
+#: .\sales\templates\sales\create_sales_item.html:25
+msgid "바코드를 스캔하면 상품이 자동으로 추가됩니다."
+msgstr "Sản phẩm sẽ được tự động thêm khi quét mã vạch."
+
+#: .\sales\templates\sales\create_sales_item.html:216
+msgid "판매 정보"
+msgstr "Thông tin bán hàng"
+
+#: .\sales\templates\sales\create_sales_item.html:247
+msgid "상품금액"
+msgstr "Giá sản phẩm"
+
+#: .\sales\templates\sales\sales_detail.html:4
+#: .\sales\templates\sales\sales_detail.html:9
+msgid "판매 상세 내역"
+msgstr "Chi tiết bán hàng"
+
+#: .\sales\templates\sales\sales_detail.html:19
+#: .\sales\templates\sales\sales_item_list.html:59
+msgid "판매자"
+msgstr "Người bán"
+
+#: .\sales\templates\sales\sales_detail.html:37
+#: .\sales\templates\sales\sales_item_list.html:7
+msgid "판매 목록"
+msgstr "Danh sách bán hàng"
+
+#: .\sales\templates\sales\sales_detail.html:57
+msgid "등록된 판매목록가 없습니다."
+msgstr "Không có sản phẩm nào được bán."
+
+#: .\sales\templates\sales\sales_detail.html:77
+msgid "판매상세내역"
+msgstr "Chi tiết bán hàng"
+
+#: .\sales\templates\sales\sales_item_list.html:9
+msgid "판매 추가"
+msgstr "Thêm bán hàng"
+
+#: .\sales\templates\sales\sales_item_list.html:53
+msgid "판매명"
+msgstr "Tên bán hàng"
+
+#: .\sales\templates\sales\sales_item_list.html:54
+msgid "매출(원)"
+msgstr "Doanh thu (₫)"
+
+#: .\sales\templates\sales\sales_item_list.html:57
+msgid "합계(원)"
+msgstr "Tổng cộng (₫)"
+
+#: .\sales\templates\sales\sales_item_list.html:125
+msgid "등록된 판매내역이 없습니다. 판매내역을 추가해보세요."
+msgstr "Không có lịch sử bán hàng nào được đăng ký. Hãy thử thêm một giao dịch bán hàng mới."
+
 #: .\templates\base.html:8
 msgid "판매/작업 관리"
 msgstr "Quản lý bán hàng/công việc"
 
-#: .\templates\base.html:37
+#: .\templates\base.html:40
 msgid "[dev] 매장 판매"
 msgstr "[dev] Bán hàng cửa hàng"
 
-#: .\templates\base.html:56
+#: .\templates\base.html:65
 msgid "프로필 수정"
 msgstr "Thông tin hồ sơ"
 
-#: .\templates\base.html:58
+#: .\templates\base.html:67
 msgid "매장 정보 관리"
 msgstr "Nhập thông tin cửa hàng"
 
-#: .\templates\base.html:61
+#: .\templates\base.html:70
 msgid "로그아웃"
 msgstr "Đăng xuất"
