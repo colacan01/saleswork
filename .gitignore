@@ -51,3 +51,12 @@ htmlcov/
 
 # npm
 node_modules/
+
+# Docker 관련
+.dockerignore
+docker-compose.txt
+docker-compose.yml
+dockerfile
+entrypoint.sh
+
+nginx/
