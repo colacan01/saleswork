@@ -20,8 +20,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='sales_index'),
-    # path('work/<int:work_id>/', views.work_detail, name='work_detail'),
-    # path('work/create/', views.create_work_item, name='create_work_item'),
-    # path('work_item_list/', views.work_item_list, name='work_item_list'),
-    # path('get-product-price/<int:product_id>/', views.get_product_price, name='get_product_price'),
+    path('sales/<int:work_id>/', views.sales_detail, name='sales_detail'),
+    path('sales/create/', views.create_sales_item, name='create_sales_item'),
+    path('sales_item_list/', views.sales_item_list, name='sales_item_list'),
+    path('get-product-price/<int:product_id>/', views.get_product_price, name='get_product_price'),
 ]
