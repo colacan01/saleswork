@@ -49,4 +49,7 @@ urlpatterns = [
     path('products/<int:pk>/', views.ProductDetailView.as_view(), name='product_detail'),
     path('products/<int:pk>/update/', views.ProductUpdateView.as_view(), name='product_update'),
     path('products/excel-upload/', views.product_excel_upload, name='product_excel_upload'),
+    
+    # API URLs
+    path('api/brands-by-supplier/', views.get_brands_by_supplier, name='brands_by_supplier'),
 ]

@@ -344,11 +344,41 @@ class ProductListView(LoginRequiredMixin, ListView):
             store = self.request.user.profile.store
         
         # 매장 기준으로 상품 필터링
-        return Product.get_store_products(store=store)
+        queryset = Product.get_store_products(store=store)
+        
+        # 공급사 필터링
+        supplier_id = self.request.GET.get('supplier')
+        if supplier_id:
+            try:
+                supplier = Supplier.objects.get(pk=supplier_id)
+                brands = Brand.objects.filter(supplier=supplier)
+                queryset = queryset.filter(brand__in=brands)
+            except:
+                Supplier.DoesNotExist
+            pass
+            
+        # 브랜드 필터링
+        brand_id = self.request.GET.get('brand')
+        if brand_id:
+            queryset = queryset.filter(brand_id=brand_id)
+            
+        # 상품명 검색
+        search_name = self.request.GET.get('search_name')
+        if search_name:
+            queryset = queryset.filter(name__icontains=search_name)
+            
+        return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = '상품 목록'
+        
+        # 공급처 정보 추가
+        store = None
+        if hasattr(self.request.user, 'profile'):
+            store = self.request.user.profile.store
+        context['suppliers'] = Supplier.get_active_suppliers(store=store)
+        
         return context
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
@@ -489,3 +519,14 @@ def product_excel_upload(request):
         messages.error(request, 'Excel 파일을 선택해주세요.')
         
     return redirect('product_list')
+
+def get_brands_by_supplier(request):
+    """공급사 ID를 받아 해당하는 브랜드 목록을 JSON으로 반환하는 API"""
+    supplier_id = request.GET.get('supplier_id')
+    
+    if supplier_id:
+        brands = Brand.objects.filter(supplier_id=supplier_id).values('id', 'name')
+    else:
+        brands = Brand.objects.all().values('id', 'name')
+    
+    return JsonResponse(list(brands), safe=False)
