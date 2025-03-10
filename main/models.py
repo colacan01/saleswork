@@ -141,6 +141,13 @@ class Product(models.Model):
         if store:
             queryset = queryset.filter(store=store)
         return queryset
+    
+    class Meta:
+        verbose_name = '상품'
+        verbose_name_plural = '상품'
+        indexes = [
+            models.Index(fields=['store', 'barcode'], name='idx_store_barcode'),
+        ]
 
 class Material(models.Model):
     """재료 모델 클래스"""
