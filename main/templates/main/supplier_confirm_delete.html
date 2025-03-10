@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}공급처 삭제{% endblock %}
+{% block title %}{% trans "공급처 삭제" %}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -8,20 +9,24 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0">공급처 삭제</h4>
+                    <h4 class="mb-0">{% trans "공급처 삭제" %}</h4>
                 </div>
                 <div class="card-body">
-                    <p class="lead">정말로 "<strong>{{ supplier.name }}</strong>" 공급처를 삭제하시겠습니까?</p>
+                    <p class="lead">
+                        {% blocktrans with supplier_name=supplier.name %}
+                        정말로 "<strong>{{ supplier_name }}</strong>" 공급처를 삭제하시겠습니까?
+                        {% endblocktrans %}
+                    </p>
                     <p class="text-danger">
-                        주의: 이 공급처와 연결된 모든 브랜드와 관련 데이터도 함께 삭제될 수 있습니다.
-                        이 작업은 취소할 수 없습니다.
+                        {% trans "주의: 이 공급처와 연결된 모든 브랜드와 관련 데이터도 함께 삭제될 수 있습니다." %}
+                        {% trans "이 작업은 취소할 수 없습니다." %}
                     </p>
                     
                     <form method="post">
                         {% csrf_token %}
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="submit" class="btn btn-danger">삭제 확인</button>
-                            <a href="{% url 'supplier-detail' supplier.id %}" class="btn btn-secondary">취소</a>
+                            <button type="submit" class="btn btn-danger">{% trans "삭제 확인" %}</button>
+                            <a href="{% url 'supplier-detail' supplier.id %}" class="btn btn-secondary">{% trans "취소" %}</a>
                         </div>
                     </form>
                 </div>
