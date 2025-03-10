@@ -2,6 +2,8 @@
 {% load humanize %}
 {% load i18n %}
 
+{% block title %}{% trans "제품 목록" %} - {% trans "판매관리 시스템" %}{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h2>{{ title }}</h2>
@@ -9,16 +11,19 @@
     <div class="d-flex justify-content-between mb-3">
         <div>
             <a href="{% url 'product_create' %}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> 상품 추가
+                <i class="fas fa-plus"></i> {% trans "상품 추가" %}
             </a>
+            <button type="button" class="btn btn-success ms-2" data-bs-toggle="modal" data-bs-target="#excelUploadModal">
+                <i class="fas fa-file-excel"></i> {% trans "Excel 업로드" %}
+            </button>
         </div>
         <div>
             <form method="get" action="{% url 'product_list' %}" class="form-inline">
                 <div class="input-group">
-                    <input type="text" name="search" class="form-control" placeholder="상품명 검색"
+                    <input type="text" name="search" class="form-control" placeholder="{% trans '상품명 검색' %}"
                            value="{{ request.GET.search }}">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="submit">검색</button>
+                        <button class="btn btn-outline-secondary" type="submit">{% trans "검색" %}</button>
                     </div>
                 </div>
             </form>
@@ -29,13 +34,13 @@
         <table class="table table-striped table-hover">
             <thead class="table-dark">
                 <tr>
-                    <th>상품명</th>
-                    <th>브랜드</th>
-                    <th>판매가격</th>
-                    <th>단위가격</th>
-                    <th>재고량</th>
-                    <th>바코드</th>
-                    <th>관리</th>
+                    <th>{% trans "상품명" %}</th>
+                    <th>{% trans "브랜드" %}</th>
+                    <th>{% trans "판매가격" %}</th>
+                    <th>{% trans "단위가격" %}</th>
+                    <th>{% trans "재고량" %}</th>
+                    <th>{% trans "바코드" %}</th>
+                    <th>{% trans "관리" %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,18 +48,18 @@
                 <tr>
                     <td>{{ product.name }}</td>
                     <td>{{ product.brand.name|default:"-" }}</td>
-                    <td>{{ product.sale_price|intcomma }}원</td>
-                    <td>{{ product.unit_price|intcomma }}원</td>
+                    <td>{{ product.sale_price|intcomma }}{% trans "원" %}</td>
+                    <td>{{ product.unit_price|intcomma }}{% trans "원" %}</td>
                     <td>{{ product.stock_quantity }}</td>
                     <td>{{ product.barcode|default:"-" }}</td>
                     <td>
-                        <a href="{% url 'product_detail' product.id %}" class="btn btn-sm btn-info">상세</a>
-                        <a href="{% url 'product_update' product.id %}" class="btn btn-sm btn-warning">수정</a>
+                        <a href="{% url 'product_detail' product.id %}" class="btn btn-sm btn-info">{% trans "상세" %}</a>
+                        <a href="{% url 'product_update' product.id %}" class="btn btn-sm btn-warning">{% trans "수정" %}</a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center">등록된 상품이 없습니다.</td>
+                    <td colspan="7" class="text-center">{% trans "등록된 상품이 없습니다." %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -100,5 +105,73 @@
         </ul>
     </nav>
     {% comment %} {% include 'includes/pagination.html' with page_obj=page_obj %} {% endcomment %}
+    
+    <!-- Excel 업로드를 위한 모달 추가 -->
+    <div class="modal fade" id="excelUploadModal" tabindex="-1" aria-labelledby="excelUploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="excelUploadModalLabel">{% trans "Excel 파일 업로드" %}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" action="{% url 'product_excel_upload' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="excelFile" class="form-label">{% trans "Excel 파일 선택" %}</label>
+                            <input type="file" class="form-control" id="excelFile" name="excel_file" accept=".xlsx, .xls" required>
+                            <div class="form-text">{% trans "지원 형식: .xlsx, .xls" %}</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "취소" %}</button>
+                        <button type="submit" class="btn btn-primary">{% trans "업로드" %}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Toast messages -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header {% if message.tags %}bg-{{ message.tags }}{% if message.tags == 'error' or message.tags == 'warning' %} text-white{% endif %}{% endif %}">
+                    <strong class="me-auto">
+                        {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle me-1"></i>
+                        {% elif message.tags == 'error' %}
+                            <i class="fas fa-exclamation-circle me-1"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                        {% elif message.tags == 'info' %}
+                            <i class="fas fa-info-circle me-1"></i>
+                        {% endif %}
+                        {{ message.tags|title }}
+                    </strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {{ message }}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        var toastList = toastElList.map(function(toastEl) {
+            return new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 5000
+            });
+        });
+        
+        toastList.forEach(toast => toast.show());
+    });
+</script>
 {% endblock %}

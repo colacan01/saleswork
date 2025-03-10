@@ -20,6 +20,7 @@ from django.views.generic import RedirectView
 from . import views
 from .views import ProductListView, ProductCreateView, ProductDetailView, ProductUpdateView
 
+
 urlpatterns = [
     path('', views.index, name='index'),
     path('work/<int:work_id>/', views.work_detail, name='work_detail'),
@@ -43,8 +44,9 @@ urlpatterns = [
     path('brands/<int:pk>/delete/', views.BrandDeleteView.as_view(), name='brand-delete'),
 
     # Product URLs
-    path('products/', ProductListView.as_view(), name='product_list'),
-    path('products/create/', ProductCreateView.as_view(), name='product_create'),
-    path('products/<int:pk>/', ProductDetailView.as_view(), name='product_detail'),
-    path('products/<int:pk>/update/', ProductUpdateView.as_view(), name='product_update'),
+    path('products/', views.ProductListView.as_view(), name='product_list'),
+    path('products/create/', views.ProductCreateView.as_view(), name='product_create'),
+    path('products/<int:pk>/', views.ProductDetailView.as_view(), name='product_detail'),
+    path('products/<int:pk>/update/', views.ProductUpdateView.as_view(), name='product_update'),
+    path('products/excel-upload/', views.product_excel_upload, name='product_excel_upload'),
 ]

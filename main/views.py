@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.contrib import messages
 from django.http import JsonResponse
 from .models import WorkItem, Material, Product
 from .forms import WorkItemForm, MaterialFormSet, ProductForm
@@ -10,8 +11,11 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-from .models import Supplier, Brand
+from .models import Supplier, Brand, Product
 from .forms import SupplierForm, BrandForm  # 폼은 별도로 생성해야 함
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+import pandas as pd
 
 # Create your views here.
 def index(request):
@@ -398,3 +402,90 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['title'] = '상품 수정'
         return context
+    
+def product_excel_upload(request):
+    if request.method == 'POST' and request.FILES.get('excel_file'):
+        excel_file = request.FILES['excel_file']
+        
+        # 파일 확장자 검증
+        if not excel_file.name.endswith(('.xlsx', '.xls')):
+            messages.error(request, '지원하지 않는 파일 형식입니다. Excel 파일(.xlsx, .xls)을 업로드해주세요.')
+            return redirect('product_list')
+        
+        try:
+            # 현재 로그인한 사용자의 store 정보 가져오기
+            store = None
+            if hasattr(request.user, 'profile') and request.user.profile.store:
+                store = request.user.profile.store
+            
+            # pandas로 Excel 파일 읽기 (첫 번째 행은 헤더, 두 번째 행부터 데이터로 처리)
+            df = pd.read_excel(excel_file, header=0)
+            
+            # 필수 열 확인
+            required_columns = ['id', 'name', 'sale_price', 'unit_price', 'stock_quantity']
+            for col in required_columns:
+                if col not in df.columns:
+                    messages.error(request, f'필수 열({col})이 Excel 파일에 없습니다.')
+                    return redirect('product_list')
+            
+            # 성공 및 오류 카운터 초기화
+            created_count = 0
+            updated_count = 0
+            error_count = 0
+            
+            # 각 행 처리 (두 번째 행부터 데이터)
+            for _, row in df.iterrows():
+                try:
+                    # 브랜드 처리 (있으면 가져오고 없으면 None)
+                    brand = None
+                    if 'brand' in df.columns and pd.notna(row['brand']):
+                        brand, _ = Brand.objects.get_or_create(name=row['brand'], store=store)
+                    
+                    # ID가 있으면 업데이트, 없으면 생성
+                    product_id = row['id'] if pd.notna(row['id']) else None
+                    
+                    defaults = {
+                        'name': row['name'],
+                        'sale_price': row['sale_price'],
+                        'unit_price': row['unit_price'],
+                        'stock_quantity': row['stock_quantity'],
+                        'brand': brand,
+                        'store': store  # 사용자의 store 정보 추가
+                    }
+                    
+                    # 선택적 필드 추가
+                    if 'barcode' in df.columns and pd.notna(row['barcode']):
+                        defaults['barcode'] = row['barcode']
+                    
+                    if product_id:
+                        # 해당 ID와 store가 일치하는 제품만 업데이트
+                        obj, created = Product.objects.update_or_create(
+                            id=product_id,
+                            store=store,  # store도 함께 검색 조건에 추가
+                            defaults=defaults
+                        )
+                        if created:
+                            created_count += 1
+                        else:
+                            updated_count += 1
+                    else:
+                        Product.objects.create(**defaults)
+                        created_count += 1
+                        
+                except Exception as e:
+                    error_count += 1
+                    print(f"Error processing row: {row}, Error: {e}")
+            
+            # 결과 메시지
+            if error_count > 0:
+                messages.warning(request, f'{created_count}개 상품 추가, {updated_count}개 상품 업데이트, {error_count}개 처리 중 오류가 발생했습니다.')
+            else:
+                messages.success(request, f'{created_count}개 상품이 추가되고 {updated_count}개 상품이 업데이트되었습니다.')
+                
+        except Exception as e:
+            messages.error(request, f'Excel 파일 처리 중 오류가 발생했습니다: {str(e)}')
+            
+    else:
+        messages.error(request, 'Excel 파일을 선택해주세요.')
+        
+    return redirect('product_list')

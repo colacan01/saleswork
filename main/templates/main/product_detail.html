@@ -9,8 +9,8 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">{{ product.name }}</h5>
             <div>
-                <a href="{% url 'product_update' product.id %}" class="btn btn-warning">수정</a>
-                <a href="{% url 'product_list' %}" class="btn btn-secondary">목록</a>
+                <a href="{% url 'product_update' product.id %}" class="btn btn-warning">{% trans "수정" %}</a>
+                <a href="{% url 'product_list' %}" class="btn btn-secondary">{% trans "목록" %}</a>
             </div>
         </div>
         
@@ -19,23 +19,23 @@
                 <div class="col-md-6">
                     <table class="table">
                         <tr>
-                            <th style="width: 30%">브랜드</th>
+                            <th style="width: 30%">{% trans "브랜드" %}</th>
                             <td>{{ product.brand.name|default:"-" }}</td>
                         </tr>
                         <tr>
-                            <th>판매가격</th>
-                            <td>{{ product.sale_price|intcomma }}원</td>
+                            <th>{% trans "판매가격" %}</th>
+                            <td>{{ product.sale_price|intcomma }}{% trans "원" %}</td>
                         </tr>
                         <tr>
-                            <th>단위가격</th>
-                            <td>{{ product.unit_price|intcomma }}원</td>
+                            <th>{% trans "단위가격" %}</th>
+                            <td>{{ product.unit_price|intcomma }}{% trans "원" %}</td>
                         </tr>
                         <tr>
-                            <th>재고 수량</th>
+                            <th>{% trans "재고 수량" %}</th>
                             <td>{{ product.stock_quantity }}</td>
                         </tr>
                         <tr>
-                            <th>바코드</th>
+                            <th>{% trans "바코드" %}</th>
                             <td>{{ product.barcode|default:"-" }}</td>
                         </tr>
                     </table>
@@ -47,7 +47,7 @@
                     {% else %}
                         <div class="alert alert-secondary">
                             <i class="fas fa-image fa-3x mb-3"></i>
-                            <p>등록된 이미지가 없습니다</p>
+                            <p>{% trans "등록된 이미지가 없습니다" %}</p>
                         </div>
                     {% endif %}
                 </div>
