@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'main.apps.MainConfig',
     'accounts.apps.AccountsConfig',
+    'widget_tweaks',
     'sales.apps.SalesConfig',
     'django.contrib.humanize',
     'django.contrib.admin',

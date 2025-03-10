@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}입고 상세 정보{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mt-4">입고 상세 정보</h1>
+    
+    <!-- 입고 정보 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-info-circle"></i>
+            {% trans "기본 정보" %}
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">{% trans "입고번호" %}</th>
+                            <td>{{ inventory.id }}</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "입고일시" %}</th>
+                            <td>{{ inventory.inventory_date|date:"Y-m-d H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "공급처" %}</th>
+                            <td>{{ inventory.supplier.name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "참조번호" %}</th>
+                            <td>{{ inventory.reference_number|default:"-" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">{% trans "총 수량" %}</th>
+                            <td>{{ inventory.total_quantity }}</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "총 금액" %}</th>
+                            <td>{{ inventory.total_amount|floatformat:0 }}원</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "담당자" %}</th>
+                            <td>{{ inventory.user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "확정 여부" %}</th>
+                            <td>
+                                {% if inventory.is_confirmed %}
+                                <span class="badge badge-success">{% trans "확정" %}</span>
+                                {% else %}
+                                <span class="badge badge-warning">{% trans "미확정" %}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            {% if inventory.notes %}
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h5>{% trans "비고" %}</h5>
+                    <div class="border p-3">{{ inventory.notes|linebreaks }}</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="row">
+                <div class="col-12 text-right">
+                    <a href="{% url 'productinventory_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-list"></i> {% trans "목록으로" %}
+                    </a>
+                    
+                    {% if not inventory.is_confirmed %}
+                    <a href="{% url 'productinventory_update' inventory.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> {% trans "수정" %}
+                    </a>
+                    <a href="{% url 'productinventory_confirm' inventory.id %}" class="btn btn-success" 
+                       onclick="return confirm('입고를 확정하시겠습니까? 확정 후에는 재고에 반영됩니다.')">
+                        <i class="fas fa-check"></i> {% trans "확정" %}
+                    </a>
+                    <a href="{% url 'productinventory_delete' inventory.id %}" class="btn btn-danger"
+                       onclick="return confirm('정말 삭제하시겠습니까?')">
+                        <i class="fas fa-trash"></i> {% trans "삭제" %}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 입고 항목 목록 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table"></i>
+            {% trans "입고 상품 목록" %}
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="inventoryItemsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>{% trans "상품명" %}</th>
+                            <th>{% trans "입고 수량" %}</th>
+                            <th>{% trans "매입가" %}</th>
+                            <th>{% trans "총 금액" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in inventory.inventory_items.all %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.purchase_price|floatformat:0 }}원</td>
+                            <td>{{ item.total_price|floatformat:0 }}원</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">{% trans "등록된 입고 상품이 없습니다." %}</td>
+                        </tr>
+                        {% endfor %}
+                        
+                        {% if inventory.inventory_items.exists %}
+                        <!-- 합계 행 -->
+                        <tr class="table-info">
+                            <th colspan="2" class="text-right">{% trans "합계" %}</th>
+                            <th>{{ inventory.total_quantity }}</th>
+                            <th>{{ inventory.total_amount|floatformat:0 }}원</th>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

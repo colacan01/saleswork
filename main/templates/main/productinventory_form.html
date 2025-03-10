@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% block title %}
+  {% if is_update %}입고 수정{% else %}새 입고 등록{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .formset-row {
+    background-color: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
+  .delete-row {
+    color: #dc3545;
+    cursor: pointer;
+  }
+  .add-row {
+    margin-top: 10px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="mt-4">{% if is_update %}입고 수정{% else %}새 입고 등록{% endif %}</h1>
+  
+  <form method="post">
+    {% csrf_token %}
+    
+    <!-- 기본 정보 -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="fas fa-info-circle"></i>
+        {% trans "기본 정보" %}
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 form-group">
+            <label for="{{ form.inventory_date.id_for_label }}">{{ form.inventory_date.label }}</label>
+            {{ form.inventory_date|add_class:"form-control" }}
+            {% if form.inventory_date.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.inventory_date.errors }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="col-md-6 form-group">
+            <label for="{{ form.supplier.id_for_label }}">{{ form.supplier.label }}</label>
+            {{ form.supplier|add_class:"form-control" }}
+            {% if form.supplier.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.supplier.errors }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 form-group">
+            <label for="{{ form.reference_number.id_for_label }}">{{ form.reference_number.label }}</label>
+            {{ form.reference_number|add_class:"form-control" }}
+            {% if form.reference_number.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.reference_number.errors }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="col-md-6 form-group">
+            <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+            {{ form.notes|add_class:"form-control" }}
+            {% if form.notes.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.notes.errors }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 입고 상품 목록 -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="fas fa-boxes"></i>
+        {% trans "입고 상품" %}
+      </div>
+      <div class="card-body">
+        {{ items.management_form }}
+        
+        <div id="formset-container">
+          {% for item_form in items.forms %}
+            <div class="formset-row">
+              {% if item_form.instance.pk %}{{ item_form.DELETE }}{% endif %}
+              
+              <div class="row">
+                <div class="col-md-6 form-group">
+                  <label for="{{ item_form.product.id_for_label }}">{{ item_form.product.label }}</label>
+                  {{ item_form.product|add_class:"form-control" }}
+                  {% if item_form.product.errors %}
+                  <div class="invalid-feedback d-block">{{ item_form.product.errors }}</div>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-2 form-group">
+                  <label for="{{ item_form.quantity.id_for_label }}">{{ item_form.quantity.label }}</label>
+                  {{ item_form.quantity|add_class:"form-control" }}
+                  {% if item_form.quantity.errors %}
+                  <div class="invalid-feedback d-block">{{ item_form.quantity.errors }}</div>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-3 form-group">
+                  <label for="{{ item_form.purchase_price.id_for_label }}">{{ item_form.purchase_price.label }}</label>
+                  <div class="input-group">
+                    {{ item_form.purchase_price|add_class:"form-control" }}
+                    <div class="input-group-append">
+                      <span class="input-group-text">원</span>
+                    </div>
+                  </div>
+                  {% if item_form.purchase_price.errors %}
+                  <div class="invalid-feedback d-block">{{ item_form.purchase_price.errors }}</div>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-1 d-flex align-items-center">
+                  {% if item_form.instance.pk %}
+                    <button type="button" class="btn btn-sm btn-outline-danger delete-row">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+              
+              <!-- 숨겨진 필드들 -->
+              {% for hidden in item_form.hidden_fields %}
+                {{ hidden }}
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        
+        <button type="button" class="btn btn-outline-primary add-row">
+          <i class="fas fa-plus"></i> {% trans "상품 추가" %}
+        </button>
+      </div>
+    </div>
+    
+    <!-- 버튼 영역 -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 text-right">
+            <a href="{% url 'productinventory_list' %}" class="btn btn-secondary">
+              <i class="fas fa-times"></i> {% trans "취소" %}
+            </a>
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-save"></i> {% trans "저장" %}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  $(document).ready(function() {
+    // 삭제 체크박스 처리
+    $('.delete-row').click(function() {
+      var row = $(this).closest('.formset-row');
+      var deleteCheckbox = row.find('input[type=checkbox]');
+      deleteCheckbox.prop('checked', true);
+      row.hide();
+    });
+    
+    // 상품 추가 버튼 처리
+    $('.add-row').click(function() {
+      var formCount = parseInt($('#id_inventory_items-TOTAL_FORMS').val());
+      var formTemplate = $('.formset-row').first().clone(true);
+      
+      // 새 폼의 인덱스 업데이트
+      var regex = /-\d+-/g;
+      formTemplate.find('input, select, textarea').each(function() {
+        var name = $(this).attr('name');
+        if (name) {
+          name = name.replace(regex, '-' + formCount + '-');
+          $(this).attr('name', name).attr('id', 'id_' + name);
+          $(this).addClass('form-control');
+        }
+      });
+      
+      // 값 초기화
+      formTemplate.find('input[type=text], input[type=number]').val('');
+      formTemplate.find('select').val('');
+      formTemplate.find('.delete-row').remove();
+      
+      // 인덱스 업데이트
+      $('#id_inventory_items-TOTAL_FORMS').val(formCount + 1);
+      
+      // 폼셋 컨테이너에 추가
+      $('#formset-container').append(formTemplate);
+    });
+    
+    // 폼 제출 전 유효성 검사
+    $('form').submit(function() {
+      var formCount = parseInt($('#id_inventory_items-TOTAL_FORMS').val());
+      var validItems = 0;
+      
+      // 각 행이 유효한지 확인 (삭제되지 않고 상품이 선택된 행)
+      for (var i = 0; i < formCount; i++) {
+        var productField = $('#id_inventory_items-' + i + '-product');
+        var deleteField = $('#id_inventory_items-' + i + '-DELETE');
+        
+        if (productField.length && productField.val() && 
+            (!deleteField.length || !deleteField.prop('checked'))) {
+          validItems++;
+        }
+      }
+      
+      if (validItems === 0) {
+        alert('최소 하나 이상의 입고 상품을 등록해야 합니다.');
+        return false;
+      }
+      
+      return true;
+    });
+  });
+</script>
+{% endblock %}

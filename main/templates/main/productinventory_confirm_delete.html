@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}상품 입고 삭제 확인{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">{% trans "상품 입고 삭제 확인" %}</h6>
+        </div>
+        <div class="card-body">
+            {% if object.is_confirmed %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    {% trans "이미 확정된 입고 내역은 삭제할 수 없습니다!" %}
+                </div>
+                <p>{% trans "확정된 입고 내역을 삭제하려면 먼저 관리자에게 문의하세요." %}</p>
+                <a href="{% url 'productinventory_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> {% trans "목록으로 돌아가기" %}
+                </a>
+            {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {% trans "정말로 이 입고 내역을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다." %}
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th style="width: 25%;">{% trans "입고 번호" %}</th>
+                                <td>{{ object.id }}</td>
+                            </tr>
+                            <tr>
+                                <th>{% trans "입고일시" %}</th>
+                                <td>{{ object.inventory_date|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <th>{% trans "공급처" %}</th>
+                                <td>{{ object.supplier.name|default:"지정되지 않음" }}</td>
+                            </tr>
+                            <tr>
+                                <th>{% trans "참조번호" %}</th>
+                                <td>{{ object.reference_number|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th>{% trans "총 수량" %}</th>
+                                <td>{{ object.total_quantity }} 개</td>
+                            </tr>
+                            <tr>
+                                <th>{% trans "총 금액" %}</th>
+                                <td>{{ object.total_amount|floatformat:0 }} 원</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h5 class="mt-4">{% trans "입고 상품 항목" %}</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th>{% trans "상품명" %}</th>
+                                <th>{% trans "수량" %}</th>
+                                <th>{% trans "매입가" %}</th>
+                                <th>{% trans "금액" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in object.inventory_items.all %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.purchase_price|floatformat:0 }} 원</td>
+                                <td>{{ item.total_price|floatformat:0 }} 원</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">{% trans "등록된 상품이 없습니다." %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'productinventory_list' %}" class="btn btn-secondary mr-2">
+                            <i class="fas fa-times"></i> {% trans "취소" %}
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> {% trans "삭제 확인" %}
+                        </button>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

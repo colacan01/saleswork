@@ -1,3 +1,4 @@
+import pandas as pd
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -11,11 +12,19 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-from .models import Supplier, Brand, Product
-from .forms import SupplierForm, BrandForm  # 폼은 별도로 생성해야 함
+from .models import Supplier, Brand, Product, ProductInventory, InventoryItem
+from .forms import SupplierForm, BrandForm, ProductForm, ProductInventoryForm, InventoryItemForm
+# from .forms import SupplierForm, BrandForm, ProductInventoryForm, InventoryItemForm  # 폼은 별도로 생성해야 함
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-import pandas as pd
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.http import HttpResponseRedirect
+from django.db import transaction
+from django.forms import inlineformset_factory
+from django.db.models import Q
+
+from main import models
 
 # Create your views here.
 def index(request):
@@ -61,7 +70,6 @@ def create_work_item(request):
                 return redirect('work_item_list')  # 목록 페이지로 이동
     else:
         work_form = WorkItemForm()
-        # material_formset = MaterialFormSet()
         material_formset = MaterialFormSet(form_kwargs={'user': request.user})  # 현재 로그인한 사용자 정보 전달
     
     return render(request, 'main/create_work_item.html', {
@@ -530,3 +538,235 @@ def get_brands_by_supplier(request):
         brands = Brand.objects.all().values('id', 'name')
     
     return JsonResponse(list(brands), safe=False)
+
+class ProductInventoryListView(LoginRequiredMixin, ListView):
+    model = ProductInventory
+    template_name = 'main/productinventory_list.html'
+    context_object_name = 'inventories'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        queryset = ProductInventory.objects.all()
+        
+        # 매장 필터링 (로그인 사용자의 매장)
+        if self.request.user.profile.store:
+            queryset = queryset.filter(store=self.request.user.profile.store)
+        
+        # 날짜 필터링
+        date_from = self.request.GET.get('date_from')
+        date_to = self.request.GET.get('date_to')
+        
+        if date_from:
+            date_from = datetime.strptime(date_from, '%Y-%m-%d').replace(hour=0, minute=0, second=0)
+            queryset = queryset.filter(inventory_date__gte=date_from)
+        
+        if date_to:
+            date_to = datetime.strptime(date_to, '%Y-%m-%d').replace(hour=23, minute=59, second=59)
+            queryset = queryset.filter(inventory_date__lte=date_to)
+        
+        # 공급처 필터링
+        supplier = self.request.GET.get('supplier')
+        if supplier:
+            queryset = queryset.filter(supplier_id=supplier)
+        
+        # 확정 여부 필터링
+        is_confirmed = self.request.GET.get('is_confirmed')
+        if is_confirmed == '1':
+            queryset = queryset.filter(is_confirmed=True)
+        elif is_confirmed == '0':
+            queryset = queryset.filter(is_confirmed=False)
+        
+        # 검색어 필터링
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                models.Q(reference_number__icontains=search) | 
+                models.Q(notes__icontains=search)
+            )
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # 공급처 목록 추가
+        store = None
+        if self.request.user.profile.store:
+            store = self.request.user.profile.store
+        context['suppliers'] = Supplier.get_active_suppliers(store=store)
+        return context
+
+class ProductInventoryDetailView(LoginRequiredMixin, DetailView):
+    model = ProductInventory
+    template_name = 'main/productinventory_detail.html'
+    context_object_name = 'inventory'
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # 사용자의 매장에 속한 입고만 조회 가능
+        if self.request.user.profile.store:
+            queryset = queryset.filter(store=self.request.user.profile.store)
+        return queryset
+
+class ProductInventoryCreateView(LoginRequiredMixin, CreateView):
+    model = ProductInventory
+    form_class = ProductInventoryForm
+    template_name = 'main/productinventory_form.html'
+    success_url = reverse_lazy('productinventory_list')
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        # 인라인 폼셋 추가
+        if self.request.POST:
+            data['items'] = InventoryItemFormSet(self.request.POST)
+        else:
+            data['items'] = InventoryItemFormSet()
+        
+        # 상품 목록 (매장 필터링)
+        store = None
+        if self.request.user.profile.store:
+            store = self.request.user.profile.store
+        data['products'] = Product.get_store_products(store=store)
+        
+        return data
+    
+    def form_valid(self, form):
+        context = self.get_context_data()
+        items = context['items']
+        
+        # 폼과 폼셋이 모두 유효한지 확인
+        if items.is_valid():
+            with transaction.atomic():
+                # 사용자와 매장 정보 설정
+                form.instance.user = self.request.user
+                if self.request.user.profile.store:
+                    form.instance.store = self.request.user.profile.store
+                
+                # 메인 폼 저장
+                self.object = form.save()
+                
+                # 아이템 폼셋 저장
+                items.instance = self.object
+                items.save()
+            
+            messages.success(self.request, '입고가 성공적으로 등록되었습니다.')
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+class ProductInventoryUpdateView(LoginRequiredMixin, UpdateView):
+    model = ProductInventory
+    form_class = ProductInventoryForm
+    template_name = 'main/productinventory_form.html'
+    context_object_name = 'inventory'
+    success_url = reverse_lazy('productinventory_list')
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # 사용자의 매장에 속한 입고만 수정 가능
+        if self.request.user.profile.store:
+            queryset = queryset.filter(store=self.request.user.profile.store)
+        # 확정된 입고는 수정 불가
+        return queryset.filter(is_confirmed=False)
+    
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        # 인라인 폼셋 추가
+        if self.request.POST:
+            data['items'] = InventoryItemFormSet(self.request.POST, instance=self.object)
+        else:
+            data['items'] = InventoryItemFormSet(instance=self.object)
+        
+        # 상품 목록 (매장 필터링)
+        store = None
+        if self.request.user.profile.store:
+            store = self.request.user.profile.store
+        data['products'] = Product.get_store_products(store=store)
+        data['is_update'] = True
+        
+        return data
+    
+    def form_valid(self, form):
+        context = self.get_context_data()
+        items = context['items']
+        
+        # 폼과 폼셋이 모두 유효한지 확인
+        if items.is_valid():
+            with transaction.atomic():
+                # 메인 폼 저장
+                self.object = form.save()
+                
+                # 아이템 폼셋 저장
+                items.instance = self.object
+                items.save()
+            
+            messages.success(self.request, '입고가 성공적으로 수정되었습니다.')
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+class ProductInventoryDeleteView(LoginRequiredMixin, DeleteView):
+    model = ProductInventory
+    template_name = 'main/productinventory_confirm_delete.html'
+    success_url = reverse_lazy('productinventory_list')
+    context_object_name = 'inventory'
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # 사용자의 매장에 속한 입고만 삭제 가능
+        if self.request.user.profile.store:
+            queryset = queryset.filter(store=self.request.user.profile.store)
+        # 확정된 입고는 삭제 불가
+        return queryset.filter(is_confirmed=False)
+    
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, '입고가 성공적으로 삭제되었습니다.')
+        return response
+
+# 입고 확정 함수 뷰
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def confirm_inventory(request, pk):
+    inventory = get_object_or_404(ProductInventory, pk=pk)
+    
+    # 사용자 권한 확인 (자신의 매장 입고만 확정 가능)
+    if request.user.profile.store and inventory.store != request.user.profile.store:
+        messages.error(request, '해당 입고를 확정할 권한이 없습니다.')
+        return redirect('productinventory_list')
+    
+    # 이미 확정된 입고는 다시 확정 불가
+    if inventory.is_confirmed:
+        messages.warning(request, '이미 확정된 입고입니다.')
+        return redirect('productinventory_detail', pk=pk)
+    
+    with transaction.atomic():
+        # 입고 확정 상태로 변경
+        inventory.is_confirmed = True
+        inventory.save()
+        
+        # 입고 항목들을 순회하며 재고 업데이트
+        for item in inventory.inventory_items.all():
+            item.product.stock_quantity += item.quantity
+            item.product.save()
+    
+    messages.success(request, '입고가 성공적으로 확정되었습니다. 재고가 업데이트되었습니다.')
+    return redirect('productinventory_detail', pk=pk)
+
+# 인라인 폼셋 정의
+InventoryItemFormSet = inlineformset_factory(
+    ProductInventory, InventoryItem, 
+    form=InventoryItemForm,
+    extra=5,  # 기본으로 보여줄 빈 폼 수
+    can_delete=True  # 항목 삭제 허용
+)

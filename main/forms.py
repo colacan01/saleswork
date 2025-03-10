@@ -1,6 +1,7 @@
 from django import forms
-from .models import WorkItem, Material, Product, Supplier, Brand
+from .models import WorkItem, Material, Product, Supplier, Brand, ProductInventory, InventoryItem
 from datetime import datetime
+from django.utils import timezone
 
 class WorkItemForm(forms.ModelForm):
     class Meta:
@@ -114,3 +115,40 @@ class ProductForm(forms.ModelForm):
         # 폼이 렌더링될 때 사용자의 매장 정보를 활용할 수 있도록 준비
         self.fields['brand'].queryset = Brand.objects.all()  # 실제 사용 시에는 매장 기준으로 필터링해야 함
         self.fields['brand'].empty_label = "브랜드 선택"
+
+class ProductInventoryForm(forms.ModelForm):
+    class Meta:
+        model = ProductInventory
+        fields = ['inventory_date', 'supplier', 'reference_number', 'notes']
+        widgets = {
+            'inventory_date': forms.DateTimeInput(
+                attrs={'type': 'datetime-local'},
+                format='%Y-%m-%dT%H:%M'
+            ),
+            'notes': forms.Textarea(attrs={'rows': 3}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        # 사용자의 매장에 속한 공급처만 보이도록 필터링
+        if self.user and self.user.profile.store:
+            self.fields['supplier'].queryset = Supplier.objects.filter(store=self.user.profile.store)
+        
+        # 초기값 설정
+        if not self.instance.pk:  # 새로운 폼일 때
+            self.fields['inventory_date'].initial = timezone.now().strftime('%Y-%m-%dT%H:%M')
+
+class InventoryItemForm(forms.ModelForm):
+    class Meta:
+        model = InventoryItem
+        fields = ['product', 'quantity', 'purchase_price']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # product 필드는 폼셋 컨텍스트에서 products를 받아 사용
+        if not self.instance.pk:  # 새로운 폼일 때
+            self.fields['purchase_price'].initial = 0
+            self.fields['quantity'].initial = 1

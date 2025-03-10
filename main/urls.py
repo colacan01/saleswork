@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import RedirectView
 from . import views
-from .views import ProductListView, ProductCreateView, ProductDetailView, ProductUpdateView
+from .views import ProductListView, ProductCreateView, ProductDetailView, ProductUpdateView, ProductInventoryListView
 
 
 urlpatterns = [
@@ -52,4 +52,12 @@ urlpatterns = [
     
     # API URLs
     path('api/brands-by-supplier/', views.get_brands_by_supplier, name='brands_by_supplier'),
+
+    # Inventory URLs
+    path('inventory/', views.ProductInventoryListView.as_view(), name='productinventory_list'),
+    path('inventory/create/', views.ProductInventoryCreateView.as_view(), name='productinventory_create'),
+    path('inventory/<int:pk>/', views.ProductInventoryDetailView.as_view(), name='productinventory_detail'),
+    path('inventory/<int:pk>/update/', views.ProductInventoryUpdateView.as_view(), name='productinventory_update'),
+    path('inventory/<int:pk>/delete/', views.ProductInventoryDeleteView.as_view(), name='productinventory_delete'),
+    path('inventory/<int:pk>/confirm/', views.confirm_inventory, name='productinventory_confirm'),
 ]
