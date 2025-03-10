@@ -119,6 +119,14 @@ class WorkItem(models.Model):
     def total_amount(self):
         """총 금액 (재료비 + 공임)"""
         return self.material_cost + self.labor_cost
+    
+    class Meta:
+        verbose_name = _('작업')
+        verbose_name_plural = _('작업목록')
+        indexes = [
+            models.Index(fields=['work_class', 'store', 'date_time'], name='idx_list1'),
+            models.Index(fields=['work_class', 'store', 'payment_method'], name='idx_list2'),
+        ]
 
 class Product(models.Model):
     """상품 모델 클래스"""
