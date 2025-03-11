@@ -161,6 +161,30 @@ def search_product_by_barcode(request, barcode):
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'오류가 발생했습니다: {str(e)}'})
 
+def product_lookup(request):
+    """
+    바코드를 이용하여 상품을 조회하고 JSON 형식으로 응답합니다.
+    """
+    barcode = request.GET.get('barcode', '')
+    
+    if not barcode:
+        return JsonResponse({'success': False, 'message': '바코드가 제공되지 않았습니다.'})
+    
+    try:
+        # 바코드를 이용하여 상품 검색
+        product = Product.objects.get(barcode=barcode)
+        return JsonResponse({
+            'success': True,
+            'product_id': product.id,
+            'product_name': product.name,
+            # 필요한 경우 추가 정보를 포함할 수 있습니다.
+        })
+    except Product.DoesNotExist:
+        return JsonResponse({'success': False, 'message': '해당 바코드의 상품이 존재하지 않습니다.'})
+    except Exception as e:
+        # 기타 예외 처리
+        return JsonResponse({'success': False, 'message': f'오류가 발생했습니다: {str(e)}'})
+
 
 # Supplier 관련 뷰
 class SupplierListView(LoginRequiredMixin, ListView):
@@ -726,7 +750,7 @@ class ProductInventoryDeleteView(LoginRequiredMixin, DeleteView):
         if self.request.user.profile.store:
             queryset = queryset.filter(store=self.request.user.profile.store)
         # 확정된 입고는 삭제 불가
-        return queryset.filter(is_confirmed=False)
+        return queryset.filter(is_confirmed = False)
     
     def delete(self, request, *args, **kwargs):
         response = super().delete(request, *args, **kwargs)
@@ -767,6 +791,6 @@ def confirm_inventory(request, pk):
 InventoryItemFormSet = inlineformset_factory(
     ProductInventory, InventoryItem, 
     form=InventoryItemForm,
-    extra=5,  # 기본으로 보여줄 빈 폼 수
+    extra=1,  # 기본으로 보여줄 빈 폼 수
     can_delete=True  # 항목 삭제 허용
 )

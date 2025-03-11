@@ -60,4 +60,7 @@ urlpatterns = [
     path('inventory/<int:pk>/update/', views.ProductInventoryUpdateView.as_view(), name='productinventory_update'),
     path('inventory/<int:pk>/delete/', views.ProductInventoryDeleteView.as_view(), name='productinventory_delete'),
     path('inventory/<int:pk>/confirm/', views.confirm_inventory, name='productinventory_confirm'),
+
+    # Barcode lookup URL
+    path('product/lookup/', views.product_lookup, name='product_lookup'),
 ]

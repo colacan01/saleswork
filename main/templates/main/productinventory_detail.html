@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
-
+{% load humanize %}
 {% block title %}입고 상세 정보{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h1 class="mt-4">입고 상세 정보</h1>
+<div class="container mt-4">
+    <h2 class="my-4">입고 상세 정보</h2>
     
     <!-- 입고 정보 -->
-    <div class="card mb-4">
+    <div class="card my-4">
         <div class="card-header">
             <i class="fas fa-info-circle"></i>
             {% trans "기본 정보" %}
@@ -44,7 +44,7 @@
                         </tr>
                         <tr>
                             <th>{% trans "총 금액" %}</th>
-                            <td>{{ inventory.total_amount|floatformat:0 }}원</td>
+                            <td>{{ inventory.total_amount|intcomma }}원</td>
                         </tr>
                         <tr>
                             <th>{% trans "담당자" %}</th>
@@ -54,9 +54,9 @@
                             <th>{% trans "확정 여부" %}</th>
                             <td>
                                 {% if inventory.is_confirmed %}
-                                <span class="badge badge-success">{% trans "확정" %}</span>
+                                <span class="badge text-bg-success">{% trans "확정" %}</span>
                                 {% else %}
-                                <span class="badge badge-warning">{% trans "미확정" %}</span>
+                                <span class="badge text-bg-warning">{% trans "미확정" %}</span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -76,20 +76,20 @@
             <div class="row">
                 <div class="col-12 text-right">
                     <a href="{% url 'productinventory_list' %}" class="btn btn-secondary">
-                        <i class="fas fa-list"></i> {% trans "목록으로" %}
+                        <i class="bi bi-list"></i> {% trans "목록으로" %}
                     </a>
                     
                     {% if not inventory.is_confirmed %}
                     <a href="{% url 'productinventory_update' inventory.id %}" class="btn btn-primary">
-                        <i class="fas fa-edit"></i> {% trans "수정" %}
+                        <i class="bi bi-edit"></i> {% trans "수정" %}
                     </a>
                     <a href="{% url 'productinventory_confirm' inventory.id %}" class="btn btn-success" 
                        onclick="return confirm('입고를 확정하시겠습니까? 확정 후에는 재고에 반영됩니다.')">
-                        <i class="fas fa-check"></i> {% trans "확정" %}
+                        <i class="bi bi-check"></i> {% trans "확정" %}
                     </a>
                     <a href="{% url 'productinventory_delete' inventory.id %}" class="btn btn-danger"
                        onclick="return confirm('정말 삭제하시겠습니까?')">
-                        <i class="fas fa-trash"></i> {% trans "삭제" %}
+                        <i class="bi bi-trash"></i> {% trans "삭제" %}
                     </a>
                     {% endif %}
                 </div>
@@ -104,23 +104,23 @@
             {% trans "입고 상품 목록" %}
         </div>
         <div class="card-body">
-            <div class="table-responsive">
+            <div class="table-responsive mt-4">
                 <table class="table table-bordered table-hover" id="inventoryItemsTable" width="100%" cellspacing="0">
-                    <thead>
+                    <thead class="table-dark">
                         <tr>
-                            <th>{% trans "상품명" %}</th>
-                            <th>{% trans "입고 수량" %}</th>
-                            <th>{% trans "매입가" %}</th>
-                            <th>{% trans "총 금액" %}</th>
+                            <th class="text-center">{% trans "상품명" %}</th>
+                            <th class="text-center">{% trans "매입가" %}</th>
+                            <th class="text-center">{% trans "입고 수량" %}</th>
+                            <th class="text-center">{% trans "총 금액" %}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for item in inventory.inventory_items.all %}
                         <tr>
                             <td>{{ item.product.name }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>{{ item.purchase_price|floatformat:0 }}원</td>
-                            <td>{{ item.total_price|floatformat:0 }}원</td>
+                            <td align="right">{{ item.purchase_price|intcomma }}원</td>
+                            <td align="right">{{ item.quantity }}</td>
+                            <td align="right">{{ item.total_price|intcomma }}원</td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -131,9 +131,9 @@
                         {% if inventory.inventory_items.exists %}
                         <!-- 합계 행 -->
                         <tr class="table-info">
-                            <th colspan="2" class="text-right">{% trans "합계" %}</th>
-                            <th>{{ inventory.total_quantity }}</th>
-                            <th>{{ inventory.total_amount|floatformat:0 }}원</th>
+                            <th colspan="2" class="text-start">{% trans "합계" %}</th>
+                            <th class="text-end">{{ inventory.total_quantity|intcomma }}</th>
+                            <th class="text-end">{{ inventory.total_amount|intcomma }}원</th>
                         </tr>
                         {% endif %}
                     </tbody>

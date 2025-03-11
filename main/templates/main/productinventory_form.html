@@ -25,8 +25,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-  <h1 class="mt-4">{% if is_update %}입고 수정{% else %}새 입고 등록{% endif %}</h1>
+<div class="container mt-4">
+  <h2 class="my-4">{% if is_update %}입고 수정{% else %}새 입고 등록{% endif %}</h2>
   
   <form method="post">
     {% csrf_token %}
@@ -81,6 +81,8 @@
       </div>
     </div>
     
+
+
     <!-- 입고 상품 목록 -->
     <div class="card mb-4">
       <div class="card-header">
@@ -90,59 +92,217 @@
       <div class="card-body">
         {{ items.management_form }}
         
-        <div id="formset-container">
-          {% for item_form in items.forms %}
-            <div class="formset-row">
-              {% if item_form.instance.pk %}{{ item_form.DELETE }}{% endif %}
+        <div class="form-group mb-3">
+          <label for="barcode-input"><i class="bi bi-barcode"></i> {% trans "바코드 스캔" %}</label>
+          <input type="text" id="barcode-input" class="form-control" 
+                 placeholder="바코드를 스캔하세요" autocomplete="off">
+          <small class="form-text text-muted">바코드를 스캔하거나 입력 후 엔터키를 누르세요</small>
+        </div>
+
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            // 행 추가 함수 정의
+            function addNewRow() {
+              const formCount = parseInt(document.getElementById('id_inventory_items-TOTAL_FORMS').value);
+              const formTemplate = document.querySelector('.formset-row').cloneNode(true);
               
-              <div class="row">
-                <div class="col-md-6 form-group">
-                  <label for="{{ item_form.product.id_for_label }}">{{ item_form.product.label }}</label>
-                  {{ item_form.product|add_class:"form-control" }}
-                  {% if item_form.product.errors %}
-                  <div class="invalid-feedback d-block">{{ item_form.product.errors }}</div>
-                  {% endif %}
-                </div>
+              // 새 폼의 인덱스 업데이트
+              const regex = /-\d+-/g;
+              formTemplate.querySelectorAll('input, select, textarea').forEach(function(element) {
+                const name = element.getAttribute('name');
+                if (name) {
+                  const newName = name.replace(regex, '-' + formCount + '-');
+                  element.setAttribute('name', newName);
+                  element.setAttribute('id', 'id_' + newName);
+                  element.classList.add('form-control');
+                }
+              });
+              
+              // 값 초기화
+              formTemplate.querySelectorAll('input[type=text], input[type=number]').forEach(function(input) {
+                input.value = '';
+              });
+              formTemplate.querySelectorAll('select').forEach(function(select) {
+                select.value = '';
+              });
+              const deleteRowButton = formTemplate.querySelector('.delete-row');
+              if (deleteRowButton) {
+                deleteRowButton.remove();
+              }
+              
+              // 인덱스 업데이트
+              document.getElementById('id_inventory_items-TOTAL_FORMS').value = formCount + 1;
+              
+              // 폼셋 컨테이너에 추가 (수정된 부분)
+              const tableBody = document.querySelector('#formset-container table tbody');
+              tableBody.appendChild(formTemplate);
+              
+              return formTemplate; // 새로 추가된 행 반환
+            }
+            
+            // 바코드 입력 처리
+            const barcodeInput = document.getElementById('barcode-input');
+            barcodeInput.addEventListener('keydown', function(e) {
+              if (e.which === 13 || e.keyCode === 13) {  // 엔터키 입력 시
+                e.preventDefault();
+                e.stopPropagation();
+                const barcode = this.value;
                 
-                <div class="col-md-2 form-group">
-                  <label for="{{ item_form.quantity.id_for_label }}">{{ item_form.quantity.label }}</label>
-                  {{ item_form.quantity|add_class:"form-control" }}
-                  {% if item_form.quantity.errors %}
-                  <div class="invalid-feedback d-block">{{ item_form.quantity.errors }}</div>
-                  {% endif %}
-                </div>
+                if (!barcode) return false;
                 
-                <div class="col-md-3 form-group">
-                  <label for="{{ item_form.purchase_price.id_for_label }}">{{ item_form.purchase_price.label }}</label>
-                  <div class="input-group">
-                    {{ item_form.purchase_price|add_class:"form-control" }}
-                    <div class="input-group-append">
-                      <span class="input-group-text">원</span>
+                // AJAX를 통해 바코드로 상품 검색 (fetch API 사용)
+                fetch('{% url "product_lookup" %}?' + new URLSearchParams({barcode: barcode}))
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.success && data.product_id) {
+                      // 상품을 찾은 경우
+                      const formsetRows = document.querySelectorAll('.formset-row');
+                      let foundExistingProduct = false;
+                      
+                      // 이미 목록에 있는 상품인지 검사
+                      for (let i = 0; i < formsetRows.length; i++) {
+                        const row = formsetRows[i];
+                        const productField = row.querySelector('select[id$="-product"]');
+                        const quantityField = row.querySelector('input[id$="-quantity"]');
+                        const deleteCheckbox = row.querySelector('input[type=checkbox][name$="-DELETE"]');
+                        
+                        // 동일한 상품이 존재하고 삭제 표시가 되어있지 않다면
+                        if (productField && productField.value == data.product_id && 
+                            (!deleteCheckbox || !deleteCheckbox.checked)) {
+                          // 수량을 1 증가시킴
+                          const currentQuantity = parseInt(quantityField.value) || 0;
+                          quantityField.value = currentQuantity + 1;
+                          foundExistingProduct = true;
+                          break;
+                        }
+                      }
+                      
+                      // 기존 상품을 찾지 못했다면
+                      if (!foundExistingProduct) {
+                        const lastRow = formsetRows[formsetRows.length-1];
+                        const lastProductField = lastRow.querySelector('select[id$="-product"]');
+                        
+                        // 마지막 행의 상품 선택 여부 확인
+                        if (lastProductField.value) {
+                          // 이미 상품이 선택된 경우 새 행 추가
+                          const newRow = addNewRow();
+                          newRow.querySelector('select[id$="-product"]').value = data.product_id;
+                          newRow.querySelector('input[id$="-quantity"]').value = 1;
+                        } else {
+                          // 마지막 행에 상품이 선택되지 않은 경우 해당 행에 설정
+                          lastProductField.value = data.product_id;
+                          lastRow.querySelector('input[id$="-quantity"]').value = 1;
+                        }
+                      }
+                      
+                      // 바코드 입력란 초기화 및 포커스
+                      barcodeInput.value = '';
+                      barcodeInput.focus();
+                    } else {
+                      // 상품을 찾지 못한 경우
+                      alert('해당 바코드의 상품이 존재하지 않습니다.');
+                      barcodeInput.select();
+                    }
+                  })
+                  .catch(error => {
+                    alert('바코드 조회 중 오류가 발생했습니다.');
+                    console.error('바코드 조회 오류:', error);
+                  });
+                
+                return false;  // 폼 제출 방지
+              }
+            });
+            
+            // 추가적인 이벤트 핸들러
+            document.querySelector('form').addEventListener('keypress', function(e) {
+              if ((e.which === 13 || e.keyCode === 13) && e.target.id === 'barcode-input') {
+                e.preventDefault();
+                return false;
+              }
+            });
+            
+            // 페이지 로드 시 바코드 입력란에 포커스
+            barcodeInput.focus();
+            
+            // 상품 추가 버튼 처리
+            document.querySelector('.add-row').addEventListener('click', function() {
+              addNewRow();
+            });
+          });
+        </script>
+
+        <div id="formset-container" class="table-responsive">
+          <table class="table table-bordered">
+            <thead class="table-dark">
+              <tr>
+                <th width="5%" class="text-center">삭제</th>
+                <th width="45%" class="text-center">상품</th>
+                <th width="15%" class="text-center">수량</th>
+                <th width="25%" class="text-center">구매 가격</th>
+                <th width="10%" class="text-center">작업</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item_form in items.forms %}
+                <tr class="formset-row">
+                  <!-- 삭제 체크박스 -->
+                  <td class="text-center align-middle">
+                    {% if item_form.instance.pk %}
+                      <div class="form-check">
+                        {{ item_form.DELETE|add_class:"form-check-input" }}
+                      </div>
+                    {% endif %}
+                  </td>
+                  
+                  <!-- 상품 선택 필드 -->
+                  <td>
+                    {{ item_form.product|add_class:"form-control" }}
+                    {% if item_form.product.errors %}
+                    <div class="invalid-feedback d-block">{{ item_form.product.errors }}</div>
+                    {% endif %}
+                  </td>
+                  
+                  <!-- 수량 필드 -->
+                  <td>
+                    {{ item_form.quantity|add_class:"form-control" }}
+                    {% if item_form.quantity.errors %}
+                    <div class="invalid-feedback d-block">{{ item_form.quantity.errors }}</div>
+                    {% endif %}
+                  </td>
+                  
+                  <!-- 구매 가격 필드 -->
+                  <td>
+                    <div class="input-group">
+                      {{ item_form.purchase_price|add_class:"form-control" }}
+                      <div class="input-group-append">
+                        <span class="input-group-text">원</span>
+                      </div>
                     </div>
-                  </div>
-                  {% if item_form.purchase_price.errors %}
-                  <div class="invalid-feedback d-block">{{ item_form.purchase_price.errors }}</div>
-                  {% endif %}
-                </div>
-                
-                <div class="col-md-1 d-flex align-items-center">
-                  {% if item_form.instance.pk %}
-                    <button type="button" class="btn btn-sm btn-outline-danger delete-row">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  {% endif %}
-                </div>
-              </div>
-              
-              <!-- 숨겨진 필드들 -->
-              {% for hidden in item_form.hidden_fields %}
-                {{ hidden }}
+                    {% if item_form.purchase_price.errors %}
+                    <div class="invalid-feedback d-block">{{ item_form.purchase_price.errors }}</div>
+                    {% endif %}
+                  </td>
+                  
+                  <!-- 삭제 버튼 -->
+                  <td class="text-center align-middle">
+                    {% if item_form.instance.pk %}
+                      <button type="button" class="btn btn-sm btn-outline-danger delete-row">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    {% endif %}
+                  </td>
+
+                  <!-- 숨겨진 필드들 -->
+                  {% for hidden in item_form.hidden_fields %}
+                    {{ hidden }}
+                  {% endfor %}
+                </tr>
               {% endfor %}
-            </div>
-          {% endfor %}
+            </tbody>
+          </table>
         </div>
         
-        <button type="button" class="btn btn-outline-primary add-row">
+        <button type="button" class="btn btn-outline-primary add-row mt-4">
           <i class="fas fa-plus"></i> {% trans "상품 추가" %}
         </button>
       </div>
@@ -154,10 +314,10 @@
         <div class="row">
           <div class="col-12 text-right">
             <a href="{% url 'productinventory_list' %}" class="btn btn-secondary">
-              <i class="fas fa-times"></i> {% trans "취소" %}
+              <i class="bi bi-times"></i> {% trans "취소" %}
             </a>
             <button type="submit" class="btn btn-success">
-              <i class="fas fa-save"></i> {% trans "저장" %}
+              <i class="bi bi-save"></i> {% trans "저장" %}
             </button>
           </div>
         </div>
@@ -165,65 +325,111 @@
     </div>
   </form>
 </div>
+
+<!-- Toast container -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <i id="toast-icon" class="bi me-2"></i>
+      <strong class="me-auto" id="toast-title"></strong>
+      <small id="toast-time"></small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" id="toast-message">
+    </div>
+  </div>
+</div>
+
+<script>
+  function showToast(message, type = 'info') {
+    // Set toast content
+    const toastElement = document.getElementById('liveToast');
+    const toastMessage = document.getElementById('toast-message');
+    const toastTitle = document.getElementById('toast-title');
+    const toastIcon = document.getElementById('toast-icon');
+    const toastTime = document.getElementById('toast-time');
+    
+    // Configure based on type
+    switch(type) {
+      case 'success':
+        toastTitle.textContent = '성공';
+        toastIcon.className = 'bi bi-check-circle-fill text-success me-2';
+        toastElement.classList.add('bg-light');
+        break;
+      case 'error':
+        toastTitle.textContent = '오류';
+        toastIcon.className = 'bi bi-exclamation-circle-fill text-danger me-2';
+        toastElement.classList.add('bg-light');
+        break;
+      case 'warning':
+        toastTitle.textContent = '경고';
+        toastIcon.className = 'bi bi-exclamation-triangle-fill text-warning me-2';
+        toastElement.classList.add('bg-light');
+        break;
+      default:
+        toastTitle.textContent = '알림';
+        toastIcon.className = 'bi bi-info-circle-fill text-info me-2';
+        toastElement.classList.add('bg-light');
+    }
+    
+    // Set message and time
+    toastMessage.textContent = message;
+    toastTime.textContent = new Date().toLocaleTimeString();
+    
+    // Show toast
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+  }
+
+  // Process Django messages if any (example)
+  document.addEventListener('DOMContentLoaded', function() {
+    // Replace with actual Django messages if available
+    {% if messages %}
+      {% for message in messages %}
+        showToast("{{ message }}", "{{ message.tags }}");
+      {% endfor %}
+    {% endif %}
+  });
+</script>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-  $(document).ready(function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // 삭제 체크박스 처리
-    $('.delete-row').click(function() {
-      var row = $(this).closest('.formset-row');
-      var deleteCheckbox = row.find('input[type=checkbox]');
-      deleteCheckbox.prop('checked', true);
-      row.hide();
+    document.querySelectorAll('.delete-row').forEach(function(deleteButton) {
+      deleteButton.addEventListener('click', function() {
+        const row = this.closest('.formset-row');
+        const deleteCheckbox = row.querySelector('input[type=checkbox]');
+        deleteCheckbox.checked = true;
+        row.style.display = 'none';
+      });
     });
     
     // 상품 추가 버튼 처리
-    $('.add-row').click(function() {
-      var formCount = parseInt($('#id_inventory_items-TOTAL_FORMS').val());
-      var formTemplate = $('.formset-row').first().clone(true);
-      
-      // 새 폼의 인덱스 업데이트
-      var regex = /-\d+-/g;
-      formTemplate.find('input, select, textarea').each(function() {
-        var name = $(this).attr('name');
-        if (name) {
-          name = name.replace(regex, '-' + formCount + '-');
-          $(this).attr('name', name).attr('id', 'id_' + name);
-          $(this).addClass('form-control');
-        }
-      });
-      
-      // 값 초기화
-      formTemplate.find('input[type=text], input[type=number]').val('');
-      formTemplate.find('select').val('');
-      formTemplate.find('.delete-row').remove();
-      
-      // 인덱스 업데이트
-      $('#id_inventory_items-TOTAL_FORMS').val(formCount + 1);
-      
-      // 폼셋 컨테이너에 추가
-      $('#formset-container').append(formTemplate);
+    document.querySelector('.add-row').addEventListener('click', function() {
+      addNewRow();
     });
     
     // 폼 제출 전 유효성 검사
-    $('form').submit(function() {
-      var formCount = parseInt($('#id_inventory_items-TOTAL_FORMS').val());
-      var validItems = 0;
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const formCount = parseInt(document.getElementById('id_inventory_items-TOTAL_FORMS').value);
+      let validItems = 0;
       
       // 각 행이 유효한지 확인 (삭제되지 않고 상품이 선택된 행)
-      for (var i = 0; i < formCount; i++) {
-        var productField = $('#id_inventory_items-' + i + '-product');
-        var deleteField = $('#id_inventory_items-' + i + '-DELETE');
+      for (let i = 0; i < formCount; i++) {
+        const productField = document.getElementById('id_inventory_items-' + i + '-product');
+        const deleteField = document.getElementById('id_inventory_items-' + i + '-DELETE');
         
-        if (productField.length && productField.val() && 
-            (!deleteField.length || !deleteField.prop('checked'))) {
+        if (productField && productField.value && 
+            (!deleteField || !deleteField.checked)) {
           validItems++;
         }
       }
       
       if (validItems === 0) {
         alert('최소 하나 이상의 입고 상품을 등록해야 합니다.');
+        e.preventDefault();
         return false;
       }
       

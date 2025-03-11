@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
-
+{% load humanize %}
 {% block title %}상품 입고 관리{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h1 class="mt-4">상품 입고 관리</h1>
+<div class="container mt-4">
+    <h2 class="mt-4">상품 입고 관리</h2>
     
     <!-- 검색 및 필터 -->
-    <div class="card mb-4">
+    <div class="card my-4">
         <div class="card-header">
             <i class="fas fa-search"></i>
             {% trans "검색 조건" %}
@@ -49,14 +49,14 @@
                         <input type="text" class="form-control" id="search" name="search" placeholder="{% trans '참조번호 또는 비고' %}" value="{{ request.GET.search }}">
                     </div>
                     <div class="col-md-6 d-flex align-items-end justify-content-end mb-3">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search"></i> {% trans "검색" %}
-                        </button>
-                        <a href="{% url 'productinventory_list' %}" class="btn btn-secondary ml-2">
-                            <i class="fas fa-redo"></i> {% trans "초기화" %}
-                        </a>
-                        <a href="{% url 'productinventory_create' %}" class="btn btn-success ml-2">
-                            <i class="fas fa-plus"></i> {% trans "새 입고 등록" %}
+                        <button type="submit" class="btn btn-primary me-1">
+                            <i class="bi bi-search"></i> {% trans "검색" %}
+                        </button> 
+                        <a href="{% url 'productinventory_list' %}" class="btn btn-secondary me-1">
+                            <i class="bi bi-redo"></i> {% trans "초기화" %}
+                        </a> 
+                        <a href="{% url 'productinventory_create' %}" class="btn btn-success">
+                            <i class="bi bi-plus"></i> {% trans "새 입고 등록" %}
                         </a>
                     </div>
                 </div>
@@ -65,25 +65,25 @@
     </div>
 
     <!-- 목록 테이블 -->
-    <div class="card mb-4">
+    {% comment %} <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-table"></i>
             {% trans "상품 입고 목록" %}
         </div>
-        <div class="card-body">
+        <div class="card-body"> {% endcomment %}
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="inventoryTable" width="100%" cellspacing="0">
-                    <thead>
+                    <thead class="table-dark">
                         <tr>
-                            <th>{% trans "입고번호" %}</th>
-                            <th>{% trans "입고일시" %}</th>
-                            <th>{% trans "공급처" %}</th>
-                            <th>{% trans "참조번호" %}</th>
-                            <th>{% trans "총 수량" %}</th>
-                            <th>{% trans "총 금액" %}</th>
-                            <th>{% trans "확정 여부" %}</th>
-                            <th>{% trans "담당자" %}</th>
-                            <th>{% trans "액션" %}</th>
+                            <th class="text-center">{% trans "입고번호" %}</th>
+                            <th class="text-center">{% trans "입고일시" %}</th>
+                            <th class="text-center">{% trans "공급처" %}</th>
+                            <th class="text-center">{% trans "참조번호" %}</th>
+                            <th class="text-center">{% trans "총 수량" %}</th>
+                            <th class="text-center">{% trans "총 금액" %}</th>
+                            <th class="text-center">{% trans "확정 여부" %}</th>
+                            <th class="text-center">{% trans "담당자" %}</th>
+                            <th class="text-center">{% trans "액션" %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,29 +93,29 @@
                             <td>{{ inventory.inventory_date|date:"Y-m-d H:i" }}</td>
                             <td>{{ inventory.supplier.name|default:"-" }}</td>
                             <td>{{ inventory.reference_number|default:"-" }}</td>
-                            <td>{{ inventory.total_quantity }}</td>
-                            <td>{{ inventory.total_amount|floatformat:0 }}원</td>
-                            <td>
+                            <td align="right">{{ inventory.total_quantity|intcomma }}</td>
+                            <td align="right">{{ inventory.total_amount|intcomma }}원</td>
+                            <td align="center">
                                 {% if inventory.is_confirmed %}
-                                <span class="badge badge-success">{% trans "확정" %}</span>
+                                <span class="badge text-bg-success">{% trans "확정" %}</span>
                                 {% else %}
-                                <span class="badge badge-warning">{% trans "미확정" %}</span>
+                                <span class="badge text-bg-warning">{% trans "미확정" %}</span>
                                 {% endif %}
                             </td>
-                            <td>{{ inventory.user.username }}</td>
-                            <td>
+                            <td align="center">{{ inventory.user.username }}</td>
+                            <td align="center">
                                 <a href="{% url 'productinventory_detail' inventory.id %}" class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{% url 'productinventory_update' inventory.id %}" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-edit"></i>
+                                    <i class="bi bi-eye"></i>
                                 </a>
                                 {% if not inventory.is_confirmed %}
+                                <a href="{% url 'productinventory_update' inventory.id %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>                                
                                 <a href="{% url 'productinventory_confirm' inventory.id %}" class="btn btn-sm btn-success" onclick="return confirm('입고를 확정하시겠습니까? 확정 후에는 재고에 반영됩니다.')">
-                                    <i class="fas fa-check"></i>
+                                    <i class="bi bi-check"></i>
                                 </a>
                                 <a href="{% url 'productinventory_delete' inventory.id %}" class="btn btn-sm btn-danger" onclick="return confirm('정말 삭제하시겠습니까?')">
-                                    <i class="fas fa-trash"></i>
+                                    <i class="bi bi-trash"></i>
                                 </a>
                                 {% endif %}
                             </td>
@@ -173,8 +173,8 @@
                 </ul>
             </nav>
             {% endif %}
-        </div>
-    </div>
+        {% comment %} </div>
+    </div> {% endcomment %}
 </div>
 {% endblock %}
 

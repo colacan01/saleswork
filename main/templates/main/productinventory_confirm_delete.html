@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load humanize %}
 
 {% block title %}상품 입고 삭제 확인{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container mt-4">
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">{% trans "상품 입고 삭제 확인" %}</h6>
@@ -61,19 +62,19 @@
                     <table class="table table-bordered table-sm">
                         <thead>
                             <tr>
-                                <th>{% trans "상품명" %}</th>
-                                <th>{% trans "수량" %}</th>
-                                <th>{% trans "매입가" %}</th>
-                                <th>{% trans "금액" %}</th>
+                                <th class="text-center">{% trans "상품명" %}</th>
+                                <th class="text-center">{% trans "수량" %}</th>
+                                <th class="text-center">{% trans "매입가" %}</th>
+                                <th class="text-center">{% trans "금액" %}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for item in object.inventory_items.all %}
                             <tr>
                                 <td>{{ item.product.name }}</td>
-                                <td>{{ item.quantity }}</td>
-                                <td>{{ item.purchase_price|floatformat:0 }} 원</td>
-                                <td>{{ item.total_price|floatformat:0 }} 원</td>
+                                <td class="text-end">{{ item.quantity|intcomma }}</td>
+                                <td class="text-end">{{ item.purchase_price|intcomma }} 원</td>
+                                <td class="text-end">{{ item.total_price|intcomma }} 원</td>
                             </tr>
                             {% empty %}
                             <tr>
@@ -87,11 +88,11 @@
                 <form method="post" class="mt-4">
                     {% csrf_token %}
                     <div class="d-flex justify-content-end">
-                        <a href="{% url 'productinventory_list' %}" class="btn btn-secondary mr-2">
-                            <i class="fas fa-times"></i> {% trans "취소" %}
+                        <a href="{% url 'productinventory_list' %}" class="btn btn-secondary me-2">
+                            <i class="bi bi-times"></i> {% trans "취소" %}
                         </a>
                         <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> {% trans "삭제 확인" %}
+                            <i class="bi bi-trash"></i> {% trans "삭제 확인" %}
                         </button>
                     </div>
                 </form>
