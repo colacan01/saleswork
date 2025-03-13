@@ -1,26 +1,45 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load i18n %}
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">{% trans "로그인" %}</div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="form-group mb-3">
-                            <label for="username">{% trans "아이디" %}</label>
-                            <input type="text" name="username" class="form-control" required>
+<div class="d-flex d-xl-flex align-items-center align-items-xl-center" style="width: 100%;height: 100%;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-9 col-lg-12 col-xl-10">
+                <div class="card shadow-lg o-hidden border-0 my-5">
+                    <div class="card-body p-0">
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-flex">
+                                <div class="flex-grow-1 bg-login-image" style="background-image: url('{% static 'site_images/durvill_logo.jpg' %}');"></div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h4 class="text-dark mb-4">{% trans "Welcome back!" %}</h4>
+                                    </div>
+                                    <form class="user" method="post">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <input id="username" class="form-control form-control-user" type="text" 
+                                                placeholder="{% trans "사용자명" %}" name="username" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <input id="password" class="form-control form-control-user" type="password" 
+                                                placeholder="{% trans "Password" %}" name="password" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <button class="btn btn-primary d-block btn-user w-100" type="submit" 
+                                                style="background: #01703E;">{% trans "로그인" %}</button>
+                                        </div>
+                                    </form>
+                                    <div class="text-center">
+                                        <p><br /><span style="color: rgb(51, 51, 51);">{% trans "계정이 없으신가요?" %} </span>
+                                            <a class="small" href="{% url 'accounts:register' %}" style="color: #01703E;">{% trans "회원가입" %}</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="password">{% trans "비밀번호" %}</label>
-                            <input type="password" name="password" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">{% trans "로그인" %}</button>
-                    </form>
-                    <div class="mt-3">
-                        <p>{% trans "계정이 없으신가요?" %} <a href="{% url 'accounts:register' %}">{% trans "회원가입" %}</a></p>
                     </div>
                 </div>
             </div>
