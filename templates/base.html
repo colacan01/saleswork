@@ -34,28 +34,26 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'work_item_list' %}">{% trans "작업 목록" %}</a>
           </li>
-          <!-- 추가 메뉴 항목 -->
-          {% if user.is_superuser %}
-          <li class="nav-item">
+          <li>
             <a class="nav-link" href="{% url 'sales_item_list' %}">{% trans "매장 판매" %}</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'supplier-list' %}">공급처 관리</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="{% url 'brand-list' %}">브랜드 관리</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'product_list' %}">상품 관리</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'productinventory_list' %}">상품 입고 관리</a>
+          <!-- 추가 메뉴 항목 -->
+          {% if user.is_superuser %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" 
+               data-bs-toggle="dropdown" aria-expanded="false">
+              {% trans "관리 메뉴" %}
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+              <li><a class="dropdown-item" href="{% url 'supplier-list' %}">공급처 관리</a></li>
+              <li><a class="dropdown-item" href="{% url 'brand-list' %}">브랜드 관리</a></li>
+              <li><a class="dropdown-item" href="{% url 'product_list' %}">상품 관리</a></li>
+              <li><a class="dropdown-item" href="{% url 'productinventory_list' %}">상품 입고 관리</a></li>
+            </ul>
           </li>
           {% endif %}
         </ul>
         {% endif %}
-
-        
 
         <ul class="navbar-nav ms-auto me-3">
           {% if user.is_authenticated %}
