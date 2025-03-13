@@ -6,7 +6,10 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mt-4">상품 입고 관리</h2>
+  <!-- 기존 alert 메시지 표시 영역 제거 -->
+  
+  <!-- 기존 내용 -->
+  <h2 class="mb-4">{% trans "입고 관리" %}</h2>
     
     <!-- 검색 및 필터 -->
     <div class="card my-4">
@@ -178,6 +181,33 @@
 </div>
 {% endblock %}
 
+{% if messages %}
+<!-- Toast container -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    {% for message in messages %}
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000" id="toast-{{ forloop.counter }}">
+        <div class="toast-header {% if message.tags == 'success' %}bg-success text-white{% elif message.tags == 'error' %}bg-danger text-white{% elif message.tags == 'warning' %}bg-warning{% elif message.tags == 'info' %}bg-info{% endif %}">
+            <strong class="me-auto">
+                {% if message.tags == 'success' %}
+                    <i class="bi bi-check-circle-fill"></i> 성공
+                {% elif message.tags == 'error' %}
+                    <i class="bi bi-exclamation-triangle-fill"></i> 오류
+                {% elif message.tags == 'warning' %}
+                    <i class="bi bi-exclamation-circle-fill"></i> 경고
+                {% elif message.tags == 'info' %}
+                    <i class="bi bi-info-circle-fill"></i> 알림
+                {% endif %}
+            </strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            {{ message }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 {% block extra_scripts %}
 <script>
     $(document).ready(function() {
@@ -192,6 +222,18 @@
             var today = new Date();
             $('#date_to').val(today.toISOString().substr(0, 10));
         }
+        
+        // Toast 초기화 및 자동 표시
+        {% if messages %}
+            {% for message in messages %}
+                var toastElement = document.getElementById('toast-{{ forloop.counter }}');
+                var toast = new bootstrap.Toast(toastElement, {
+                    autohide: true,
+                    delay: 5000  // 5초 후 자동으로 사라짐
+                });
+                toast.show();
+            {% endfor %}
+        {% endif %}
     });
 </script>
 {% endblock %}

@@ -598,7 +598,7 @@ class ProductInventoryListView(LoginRequiredMixin, ListView):
         if is_confirmed == '1':
             queryset = queryset.filter(is_confirmed=True)
         elif is_confirmed == '0':
-            queryset = queryset.filter(is_confirmed=False)
+            queryset = queryset.filter(is_confirmed(False))
         
         # 검색어 필터링
         search = self.request.GET.get('search')
@@ -635,108 +635,80 @@ class ProductInventoryCreateView(LoginRequiredMixin, CreateView):
     model = ProductInventory
     form_class = ProductInventoryForm
     template_name = 'main/productinventory_form.html'
-    success_url = reverse_lazy('productinventory_list')
-    
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
     
     def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        # 인라인 폼셋 추가
+        context = super().get_context_data(**kwargs)
+        context['is_update'] = False
+        
         if self.request.POST:
-            data['items'] = InventoryItemFormSet(self.request.POST)
+            context['items'] = InventoryItemFormSet(self.request.POST, instance=self.object)
         else:
-            data['items'] = InventoryItemFormSet()
+            context['items'] = InventoryItemFormSet(instance=self.object)
         
-        # 상품 목록 (매장 필터링)
-        store = None
-        if self.request.user.profile.store:
-            store = self.request.user.profile.store
-        data['products'] = Product.get_store_products(store=store)
-        
-        return data
+        return context
     
     def form_valid(self, form):
         context = self.get_context_data()
         items = context['items']
         
-        # 폼과 폼셋이 모두 유효한지 확인
-        if items.is_valid():
-            with transaction.atomic():
-                # 사용자와 매장 정보 설정
-                form.instance.user = self.request.user
-                if self.request.user.profile.store:
-                    form.instance.store = self.request.user.profile.store
-                
-                # 메인 폼 저장
-                self.object = form.save()
-                
-                # 아이템 폼셋 저장
+        with transaction.atomic():
+            form.instance.store = self.request.user.profile.store
+            form.instance.created_by = self.request.user
+            self.object = form.save()
+            
+            if items.is_valid():
                 items.instance = self.object
                 items.save()
-            
-            messages.success(self.request, '입고가 성공적으로 등록되었습니다.')
-            return HttpResponseRedirect(self.get_success_url())
-        else:
-            return self.render_to_response(self.get_context_data(form=form))
+                
+                # 저장 성공 메시지 추가
+                messages.success(self.request, '입고 정보가 성공적으로 저장되었습니다.')
+                
+                # 상품입고 목록으로 리다이렉트
+                return HttpResponseRedirect(reverse('productinventory_list'))
+        
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('productinventory_list')
 
 class ProductInventoryUpdateView(LoginRequiredMixin, UpdateView):
     model = ProductInventory
     form_class = ProductInventoryForm
     template_name = 'main/productinventory_form.html'
-    context_object_name = 'inventory'
-    success_url = reverse_lazy('productinventory_list')
-    
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
-    
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        # 사용자의 매장에 속한 입고만 수정 가능
-        if self.request.user.profile.store:
-            queryset = queryset.filter(store=self.request.user.profile.store)
-        # 확정된 입고는 수정 불가
-        return queryset.filter(is_confirmed=False)
     
     def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        # 인라인 폼셋 추가
+        context = super().get_context_data(**kwargs)
+        context['is_update'] = True
+        
         if self.request.POST:
-            data['items'] = InventoryItemFormSet(self.request.POST, instance=self.object)
+            context['items'] = InventoryItemFormSet(self.request.POST, instance=self.object)
         else:
-            data['items'] = InventoryItemFormSet(instance=self.object)
+            context['items'] = InventoryItemFormSet(instance=self.object)
         
-        # 상품 목록 (매장 필터링)
-        store = None
-        if self.request.user.profile.store:
-            store = self.request.user.profile.store
-        data['products'] = Product.get_store_products(store=store)
-        data['is_update'] = True
-        
-        return data
+        return context
     
     def form_valid(self, form):
         context = self.get_context_data()
         items = context['items']
         
-        # 폼과 폼셋이 모두 유효한지 확인
-        if items.is_valid():
-            with transaction.atomic():
-                # 메인 폼 저장
-                self.object = form.save()
-                
-                # 아이템 폼셋 저장
+        with transaction.atomic():
+            form.instance.updated_by = self.request.user
+            self.object = form.save()
+            
+            if items.is_valid():
                 items.instance = self.object
                 items.save()
-            
-            messages.success(self.request, '입고가 성공적으로 수정되었습니다.')
-            return HttpResponseRedirect(self.get_success_url())
-        else:
-            return self.render_to_response(self.get_context_data(form=form))
+                
+                # 저장 성공 메시지 추가
+                messages.success(self.request, '입고 정보가 성공적으로 수정되었습니다.')
+                
+                # 상품입고 목록으로 리다이렉트
+                return HttpResponseRedirect(reverse('productinventory_list'))
+        
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('productinventory_list')
 
 class ProductInventoryDeleteView(LoginRequiredMixin, DeleteView):
     model = ProductInventory
@@ -794,3 +766,38 @@ InventoryItemFormSet = inlineformset_factory(
     extra=1,  # 기본으로 보여줄 빈 폼 수
     can_delete=True  # 항목 삭제 허용
 )
+
+from django.views.decorators.http import require_POST
+import json
+
+@login_required
+@require_POST
+def inventoryitem_delete(request):
+    """
+    입고 상품 항목을 삭제하는 AJAX 요청을 처리합니다.
+    """
+    try:
+        # GET 파라미터에서 item_id 추출
+        item_id = request.GET.get('item_id')
+        
+        if not item_id:
+            return JsonResponse({'success': False, 'message': '항목 ID가 제공되지 않았습니다.'})
+        
+        # 항목 조회
+        item = get_object_or_404(InventoryItem, pk=item_id)
+        
+        # 현재 사용자의 매장과 항목의 매장이 일치하는지 확인
+        if request.user.profile.store and item.inventory.store != request.user.profile.store:
+            return JsonResponse({'success': False, 'message': '이 항목을 삭제할 권한이 없습니다.'})
+        
+        # 입고가 이미 확정되었는지 확인
+        if item.inventory.is_confirmed:
+            return JsonResponse({'success': False, 'message': '확정된 입고의 항목은 삭제할 수 없습니다.'})
+        
+        # 항목 삭제
+        item.delete()
+        
+        return JsonResponse({'success': True, 'message': '항목이 삭제되었습니다.'})
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'오류가 발생했습니다: {str(e)}'})
