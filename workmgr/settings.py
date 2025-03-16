@@ -27,7 +27,20 @@ SECRET_KEY = 'django-insecure-vve3p^e*l^dn5xq)(%&mxj8$=-tnpygh-q0%_a07$s@)mi16@(
 DEBUG = True
 
 # ALLOWED_HOSTS = ['172.30.1.58']
-ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+                '172.30.1.58',
+                'cms.doit-partners.com',
+                'localhost',
+                '127.0.0.1'
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://172.30.1.58:8080',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+]
+
 
 # Application definition
 
