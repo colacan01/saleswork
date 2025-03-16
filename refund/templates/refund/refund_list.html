@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans '환불 목록' %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{% trans '환불 관리' %}</h1>
+        <a href="{% url 'refund:refund_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> {% trans '환불 등록' %}
+        </a>
+    </div>
+
+    <!-- 검색 및 필터 폼 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="search" class="form-control" placeholder="{% trans '검색어...' %}" value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">{% trans '전체 상태' %}</option>
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="start_date" class="form-control" placeholder="{% trans '시작일' %}" value="{{ request.GET.start_date }}">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="end_date" class="form-control" placeholder="{% trans '종료일' %}" value="{{ request.GET.end_date }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-search"></i> {% trans '검색' %}
+                    </button>
+                    <a href="{% url 'refund:refund_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-redo"></i> {% trans '초기화' %}
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 환불 목록 테이블 -->
+    <div class="card">
+        <div class="card-body">
+            {% if refunds %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>{% trans '환불 ID' %}</th>
+                                <th>{% trans '환불일시' %}</th>
+                                <th>{% trans '고객전화번호' %}</th>
+                                <th>{% trans '주문번호' %}</th>
+                                <th>{% trans '환불방법' %}</th>
+                                <th>{% trans '환불금액' %}</th>
+                                <th>{% trans '상태' %}</th>
+                                <th>{% trans '처리자' %}</th>
+                                <th>{% trans '매장' %}</th>
+                                <th>{% trans '작업' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for refund in refunds %}
+                                <tr>
+                                    <td>{{ refund.id }}</td>
+                                    <td>{{ refund.refund_date|date:"Y-m-d H:i" }}</td>
+                                    <td>{{ refund.customer_phone|default:"-" }}</td>
+                                    <td>{{ refund.order_number|default:"-" }}</td>
+                                    <td>{{ refund.get_refund_method_display }}</td>
+                                    <td class="text-end">{{ refund.total_amount|floatformat:0 }}원</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if refund.status == 'PENDING' %}bg-warning
+                                            {% elif refund.status == 'APPROVED' %}bg-info
+                                            {% elif refund.status == 'COMPLETED' %}bg-success
+                                            {% elif refund.status == 'REJECTED' %}bg-danger
+                                            {% endif %}">
+                                            {{ refund.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ refund.user.username }}</td>
+                                    <td>{{ refund.store.name|default:"-" }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'refund:refund_detail' refund.id %}" class="btn btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'refund:refund_update' refund.id %}" class="btn btn-outline-secondary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'refund:refund_delete' refund.id %}" class="btn btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 페이지네이션 -->
+                {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center p-5">
+                    <p class="text-muted">{% trans '환불 내역이 없습니다.' %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

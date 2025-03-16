@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}
+    {% if object %}
+        {% trans '환불 수정' %}
+    {% else %}
+        {% trans '환불 등록' %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>
+                    {% if object %}
+                        {% trans '환불 수정' %}
+                    {% else %}
+                        {% trans '환불 등록' %}
+                    {% endif %}
+                </h1>
+                <a href="{% url 'refund:refund_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> {% trans '목록으로' %}
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" id="refundForm">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.refund_date.id_for_label }}" class="form-label">{{ form.refund_date.label }}</label>
+                                    {{ form.refund_date }}
+                                    {% if form.refund_date.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.refund_date.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.customer_phone.id_for_label }}" class="form-label">{{ form.customer_phone.label }}</label>
+                                    {{ form.customer_phone }}
+                                    {% if form.customer_phone.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.customer_phone.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.order_number.id_for_label }}" class="form-label">{{ form.order_number.label }}</label>
+                                    {{ form.order_number }}
+                                    {% if form.order_number.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.order_number.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <!-- 매장 선택란 삭제됨 -->
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.status.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.refund_method.id_for_label }}" class="form-label">{{ form.refund_method.label }}</label>
+                                    {{ form.refund_method }}
+                                    {% if form.refund_method.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.refund_method.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.user.id_for_label }}" class="form-label">{{ form.user.label }}</label>
+                                    {{ form.user }}
+                                    {% if form.user.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.user.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="{{ form.reason.id_for_label }}" class="form-label">{{ form.reason.label }}</label>
+                                    {{ form.reason }}
+                                    {% if form.reason.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.reason.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}</label>
+                                    {{ form.notes }}
+                                    {% if form.notes.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.notes.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% trans '저장' %}
+                            </button>
+                            <a href="{% url 'refund:refund_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> {% trans '취소' %}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if object %}
+            <!-- 환불 상품 목록 -->
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">{% trans '환불 상품 목록' %}</h5>
+                    <a href="{% url 'refund:add_refund_item' object.id %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> {% trans '상품 추가' %}
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if refund_items %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{% trans '상품명' %}</th>
+                                        <th class="text-center">{% trans '수량' %}</th>
+                                        <th class="text-end">{% trans '단가' %}</th>
+                                        <th class="text-end">{% trans '금액' %}</th>
+                                        <th>{% trans '작업' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in refund_items %}
+                                        <tr>
+                                            <td>{{ item.product.name }}</td>
+                                            <td class="text-center">{{ item.quantity }}</td>
+                                            <td class="text-end">{{ item.unit_price|floatformat:0 }}원</td>
+                                            <td class="text-end fw-bold">{{ item.total_cost|floatformat:0 }}원</td>
+                                            <td>
+                                                <a href="{% url 'refund:delete_refund_item' item.id %}" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    <tr class="table-secondary">
+                                        <td colspan="3" class="text-end fw-bold">{% trans '총 환불금액' %}:</td>
+                                        <td class="text-end fs-5 fw-bold text-danger">{{ object.total_amount|floatformat:0 }}원</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center p-5">
+                            <p class="text-muted">{% trans '환불 상품이 없습니다. 상품을 추가해주세요.' %}</p>
+                            <a href="{% url 'refund:add_refund_item' object.id %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> {% trans '상품 추가' %}
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Select2 적용
+    $('.select-search').select2({
+        theme: 'bootstrap-5',
+        width: '100%'
+    });
+    
+    // DateTimePicker 적용
+    $('#id_refund_date').datetimepicker({
+        format: 'YYYY-MM-DD HH:mm',
+        icons: {
+            time: 'far fa-clock',
+            date: 'far fa-calendar',
+            up: 'fas fa-arrow-up',
+            down: 'fas fa-arrow-down',
+            previous: 'fas fa-chevron-left',
+            next: 'fas fa-chevron-right',
+            today: 'fas fa-calendar-check',
+            clear: 'far fa-trash-alt',
+            close: 'fas fa-times'
+        }
+    });
+});
+</script>
+{% endblock %}

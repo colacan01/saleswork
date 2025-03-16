@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'widget_tweaks',
     'sales.apps.SalesConfig',
+    'refund.apps.RefundConfig',
     'django.contrib.humanize',
     'django.contrib.admin',
     'django.contrib.auth',

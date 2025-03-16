@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans '환불 삭제' %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">{% trans '환불 데이터 삭제' %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {% trans '이 작업은 되돌릴 수 없습니다. 정말로 이 환불 데이터를 삭제하시겠습니까?' %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>{% trans '삭제하려는 환불 정보:' %}</h6>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th class="w-25">{% trans '환불 ID' %}</th>
+                                <td>{{ object.id }}</td>
+                            </tr>
+                            <tr>
+                                <th>{% trans '환불일시' %}</th>
+                                <td>{{ object.refund_date|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <th>{% trans '고객 전화번호' %}</th>
+                                <td>{{ object.customer_phone|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th>{% trans '총 환불금액' %}</th>
+                                <td class="fw-bold text-danger">{{ object.total_amount|floatformat:0 }}원</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'refund:refund_detail' object.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> {% trans '취소' %}
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> {% trans '삭제 확인' %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('main.urls')),
     path('accounts/', include('accounts.urls')),
     path('sales/', include('sales.urls')),
+    path('refund/', include('refund.urls')),
 ]
 
 # 다국어 적용이 필요한 URL 패턴들
@@ -34,6 +35,7 @@ urlpatterns += i18n_patterns(
     path('', include('main.urls')),
     path('accounts/', include('accounts.urls')),
     path('sales/', include('sales.urls')),
+    path('refund/', include('refund.urls')),
     prefix_default_language=True  # 기본 언어도 URL에 접두어로 표시
 )
 
