@@ -39,6 +39,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://172.30.1.58:8080',
     'http://localhost:8080',
     'http://127.0.0.1:8080',
+    'http://cms.doit-partners.com',
+    'https:://cms.doit-partners.com',
 ]
 
 
